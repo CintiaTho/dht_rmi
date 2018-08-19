@@ -18,3 +18,25 @@ Para fazer o protocolo como funções a serem tratadas pelos nós, ao invés de mand
 invocamos a função remota do nó e passamos como parâmetros o conteúdo que seria passado via mensagem;
 
 -- Unico erro a ser tratado será de tentar entrar na rede (um nó da lista) e ndescobrir que eles estão desativados...até ser necessário criar uma nova rede;
+
+----------------------------------------------------------------
+		UUID uuid = UUID.randomUUID();
+		String myRandom = uuid.toString();
+		myRandom = "dd5e2e9e-c396-41fe-9e0c-7e7ee9b1b857";
+		System.out.println("myRandom = "+myRandom);
+		byte[] a = gerarHash(myRandom);
+		System.out.println("a = "+a);
+		System.out.println("stringHexa = "+stringHexa(a));
+		System.out.println("a.toString() = "+a.toString());
+		System.out.println("a.hashCode() = "+a.hashCode());
+		System.out.println();
+		
+		uuid = UUID.randomUUID();
+		myRandom = uuid.toString();
+		myRandom = "37a019be-7d67-414d-90b4-600c760d8333";
+		System.out.println(myRandom);
+		byte[] b = gerarHash(myRandom);
+		System.out.println(stringHexa(b));
+		System.out.println(b.hashCode());
+		
+		System.out.println(a.hashCode()-b.hashCode());

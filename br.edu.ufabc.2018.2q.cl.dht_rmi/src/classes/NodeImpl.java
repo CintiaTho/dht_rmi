@@ -10,43 +10,29 @@ public class NodeImpl implements Node {
 	private byte[] antid;
 	private HashMap <byte[], String> texts;
 	
-	@Override
-	public byte[] getId_my() {
+	public byte[] getMyid() {
 		return myid;
 	}
-	
-	@Override
-	public void setId_my(byte[] id_my) {
-		this.myid = id_my;
+	public void setMyid(byte[] myid) {
+		this.myid = myid;
 	}
-	
-	@Override
-	public byte[] getId_prox() {
+	public byte[] getProxid() {
 		return proxid;
 	}
-	
-	@Override
-	public void setId_prox(byte[] id_prox) {
-		this.proxid = id_prox;
+	public void setProxid(byte[] proxid) {
+		this.proxid = proxid;
 	}
-	
-	@Override
-	public byte[] getId_ant() {
+	public byte[] getAntid() {
 		return antid;
 	}
-	
-	@Override
-	public void setId_ant(byte[] id_ant) {
-		this.antid = id_ant;
+	public void setAntid(byte[] antid) {
+		this.antid = antid;
 	}
-	
-	@Override
 	public HashMap<byte[], String> getTexts() {
 		return texts;
 	}
-	
-	@Override
 	public void setTexts(HashMap<byte[], String> texts) {
 		this.texts = texts;
 	}
+	
 }

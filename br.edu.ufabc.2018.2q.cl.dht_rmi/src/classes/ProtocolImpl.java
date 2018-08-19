@@ -1,8 +1,6 @@
 package classes;
 
 import java.rmi.RemoteException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class ProtocolImpl implements Protocol {
 	private Node node;

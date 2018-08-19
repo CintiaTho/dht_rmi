@@ -5,17 +5,17 @@ import java.util.HashMap;
 
 public interface Node extends java.io.Serializable {
 	
-	public byte[] getId_my() throws RemoteException;
+	public byte[] getMyid() throws RemoteException;
 	
-	public void setId_my(byte[] id_my) throws RemoteException;
+	public void setMyid(byte[] myid) throws RemoteException;
 	
-	public byte[] getId_prox() throws RemoteException;
+	public byte[] getProxid() throws RemoteException;
 	
-	public void setId_prox(byte[] id_prox) throws RemoteException;
+	public void setProxid(byte[] proxid) throws RemoteException;
 	
-	public byte[] getId_ant() throws RemoteException;
+	public byte[] getAntid() throws RemoteException;
 	
-	public void setId_ant(byte[] id_ant) throws RemoteException;
+	public void setAntid(byte[] antid) throws RemoteException;
 	
 	public HashMap<byte[], String> getTexts() throws RemoteException;
 	
