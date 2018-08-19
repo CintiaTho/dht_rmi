@@ -4,9 +4,13 @@ import java.rmi.RemoteException;
 
 public class ProtocolImpl implements Protocol {
 	private Node node;
-
+	
 	public Node getNode() {
 		return node;
+	}
+
+	public ProtocolImpl(Node node) {
+		this.node = node;
 	}
 
 	public void setNode(Node node) {
