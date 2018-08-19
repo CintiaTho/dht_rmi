@@ -1,13 +1,19 @@
-package rmi;
+package dht_rmi;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-public class Dht {
-	String algoritmoHash = "MD5";
+public class Dht {	
+	public static void main(String[] args) {		
+		UUID uuid = UUID.randomUUID();
+		String myRandom = uuid.toString();
+		System.out.println(myRandom.substring(0,20));	
+
+	}
 	
-	public byte[] gerarHash(String frase, String algoritmoHash) {
+	public byte[] gerarHash(String frase) {
+		String algoritmoHash = "MD5";
 		try {
 			MessageDigest md = MessageDigest.getInstance(algoritmoHash);
 			md.update(frase.getBytes());
@@ -17,11 +23,4 @@ public class Dht {
 		}
 	}
 	
-	public static void main(String[] args) {
-		UUID uuid = UUID.randomUUID();
-		String myRandom = uuid.toString();
-		System.out.println(myRandom.substring(0,20));	
-
-	}
-
 }
