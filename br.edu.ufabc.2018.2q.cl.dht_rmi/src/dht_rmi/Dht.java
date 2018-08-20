@@ -25,6 +25,7 @@ public class Dht {
 	//Criacao de variaveis de trabalho dos metodos
 	static int falsoID = -1;
 	static String texto = "";
+	static String nodes_list = "nodes_list.txt";
 	static byte[] id = null;
 	static Node node = null;
 	static Protocol protocol = null;
@@ -75,13 +76,18 @@ public class Dht {
 					break;
 				//-------------------------------------------------
 				case "join":
-					if(falsoID>=0) {
+					if(falsoID>0) {
 						System.out.print("Quer realmente realizar esta ação? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							criarNodeDHT();
-							falsoID = stubList.size()+1;
-							Protocol primNode = stubList.get(0);
+							falsoID = stubList.size();
+							if(stubList.size()==1) {
+								System.out.println("Você é o primeiro nó - Criada uma nova DHT!");	
+							}
+							else {
+								Protocol primNode = stubList.get(0);
+							}
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
 					} else System.out.println("Comando inválido, você já pertence à uma DHT!");
@@ -146,7 +152,7 @@ public class Dht {
 	public static void gravarStubTxt(Protocol stub) {
 		ObjectOutputStream out = null;
 		try {
-			out = new ObjectOutputStream(new FileOutputStream("nodes_list.txt", true));
+			out = new ObjectOutputStream(new FileOutputStream(nodes_list, true));
 			out.writeObject(stub);
 			out.flush();
 			out.close();
@@ -159,7 +165,7 @@ public class Dht {
 		ObjectInputStream in = null;
 		boolean oef = false;
 		Protocol umObjeto = null;
-		in = new ObjectInputStream(new FileInputStream("nodes_list.txt"));
+		in = new ObjectInputStream(new FileInputStream(nodes_list));
 		while (oef == false) {
 			try {
 				umObjeto = (Protocol) in.readObject();
