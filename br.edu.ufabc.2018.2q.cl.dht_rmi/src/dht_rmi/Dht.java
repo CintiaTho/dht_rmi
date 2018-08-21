@@ -1,6 +1,5 @@
 package dht_rmi;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -13,6 +12,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -35,7 +35,7 @@ public class Dht {
 	static Protocol stub = null;
 	static Protocol next_stub = null;
 	static Protocol ant_stub = null;
-	static List<Protocol> stubList = null;
+	static ArrayList<Protocol> stubList = null;
 
 	public static void main(String[] args) {
 		Scanner entrada = new Scanner(System.in);
@@ -50,7 +50,11 @@ public class Dht {
 			while (comando != "quit") {
 
 				//Sempre mantendo atualizado o tamanho da DHT para fins demonstrativos
-				if(falsoID >= 0) leituraStubTxt();
+				//if(falsoID >= 0) 
+				try {
+					leituraStubTxt();
+				}  catch (EOFException  eofException) {
+				}
 
 				//informacoes que sempre aparecerao ao usuario
 				System.out.println();
@@ -161,7 +165,8 @@ public class Dht {
 		node = new NodeImpl(id);
 		protocol = new ProtocolImpl(node);
 		stub = gerarStub(protocol);
-		gravarStubTxt(stub);
+		stubList.add(stub);
+		gravarStubTxt(stubList);
 	}
 
 	public static Protocol gerarStub(Protocol protocol) {
@@ -174,11 +179,11 @@ public class Dht {
 		return stub;
 	}
 
-	public static void gravarStubTxt(Protocol stub) {
+	public static void gravarStubTxt(List<Protocol> stubList) {
 		ObjectOutputStream out = null;
 		try {
-			out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(nodesFile, true)));
-			out.writeObject(stub);
+			out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(nodesFile)));
+			out.writeObject(stubList);
 			out.flush();
 			out.close();
 		} catch (IOException ex) {
@@ -189,12 +194,12 @@ public class Dht {
 	public static void leituraStubTxt() throws IOException {
 		ObjectInputStream in = null;
 		boolean oef = false;
-		Protocol umObjeto = null;
+		ArrayList<Protocol> objetos = null;
 		in = new ObjectInputStream(new FileInputStream(nodesFile));
 		while (oef == false) {
 			try {
-				umObjeto = (Protocol) in.readObject();
-				if(!umObjeto.equals(null)) stubList.add(umObjeto);
+				objetos = (ArrayList<Protocol>) in.readObject();
+				if(!objetos.equals(null)) stubList = objetos;
 			}  catch (EOFException  eofException) {
 				in.close();
 				break;
