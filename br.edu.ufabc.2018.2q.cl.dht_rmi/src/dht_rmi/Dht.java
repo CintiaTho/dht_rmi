@@ -101,15 +101,36 @@ public class Dht {
 					break;
 					//-------------------------------------------------
 				case "leave":
-
+					if(falsoID>=0) {
+						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						text = entrada.nextLine();
+						if(text.equals("s")){
+							
+						} else if(text.equals("n")) System.out.println("Operação cancelada!");
+						else System.out.println("Comando inválido, operação cancelada!");
+					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
 					break;
 					//-------------------------------------------------
 				case "store":
-
+					if(falsoID>=0) {
+						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						text = entrada.nextLine();
+						if(text.equals("s")){
+							
+						} else if(text.equals("n")) System.out.println("Operação cancelada!");
+						else System.out.println("Comando inválido, operação cancelada!");
+					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
 					break;	
 					//-------------------------------------------------
 				case "retrieve":
-
+					if(falsoID>=0) {
+						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						text = entrada.nextLine();
+						if(text.equals("s")){
+							
+						} else if(text.equals("n")) System.out.println("Operação cancelada!");
+						else System.out.println("Comando inválido, operação cancelada!");
+					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
 					break;	
 					//-------------------------------------------------
 				case "quit":
