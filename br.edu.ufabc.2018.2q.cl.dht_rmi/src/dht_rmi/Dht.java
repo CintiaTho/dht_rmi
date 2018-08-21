@@ -1,12 +1,14 @@
 package dht_rmi;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
@@ -23,9 +25,9 @@ import classes.QuitException;
 
 public class Dht {
 	//Criacao de variaveis de trabalho dos metodos
-	static int falsoID = -1;
+	static int falsoID;
 	static String texto = "";
-	static String nodesListPath = "nodes_list.txt";
+	static File nodesFile = new File("./src/dht_rmi/nodes_list.txt");
 	static String algoritmoHash = "MD5";
 	static byte[] id = null;
 	static Node node = null;
@@ -39,7 +41,7 @@ public class Dht {
 		Scanner entrada = new Scanner(System.in);
 		String comando = "";
 		String text;
-
+		falsoID = -1;
 		//texto inicial explicativo sobre o funcionamento da interface
 		System.out.println("Digite: 'commands' para visualisar a lista de possíveis comandos permitidos ao usuário.");
 		System.out.println("Caso já os conheça, digite a primeira ação que deseja realizar e aperte enter...");
@@ -47,8 +49,8 @@ public class Dht {
 			//loop principal para receber os comandos do usuario e mostrar informacoes
 			while (comando != "quit") {
 
-				//Sempre mantendo atualizado o tamanho da DHT
-				leituraStubTxt();
+				//Sempre mantendo atualizado o tamanho da DHT para fins demonstrativos
+				if(falsoID >= 0) leituraStubTxt();
 
 				//informacoes que sempre aparecerao ao usuario
 				System.out.println();
@@ -79,14 +81,15 @@ public class Dht {
 				case "join":
 					//Vamos fazer tudo usando um aArquivo txt local apenas para nossos testes, em uma situação "real" este arquivo seria disponibilizado para quem quer entrar na rede;
 					//Quando um nó entrar na rede, ele pode gravar a si próprio, e quando sair da rede, apagar a si próprio do arquivo (na situação "real", ele gravaria o antecessor e o sucessor para tentar manter a lista)  
-					if(falsoID>0) {
+					if(falsoID<0) {
 						System.out.print("Quer realmente realizar esta ação? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							criarNodeDHT();
-							falsoID = stubList.size();
-							if(stubList.size()==1) {
-								System.out.println("Você é o primeiro nó - Criada uma nova DHT!");	
+							leituraStubTxt();
+							falsoID = stubList.size()+1;
+							if(falsoID==1) {
+								System.out.println("Você é o primeiro nó na rede - Criada uma nova DHT!");	
 							}
 							//Unico erro a ser tratado será de tentar entrar na rede (um nó da lista) e descobrir que eles estão desativados...até ser necessário criar uma nova rede;
 							else {
@@ -126,8 +129,6 @@ public class Dht {
 			}	
 		} catch (QuitException e) {
 			System.out.println("Encerrada sua sessão com sucesso!");
-		} catch (ConnectException e) {
-			System.err.println("Problemas com o Registry: " + e.toString());
 		} catch (Exception e) {
 			System.err.println("Ocorreu um erro no servidor: " + e.toString());
 		}
@@ -147,7 +148,6 @@ public class Dht {
 		try {
 			stub = (Protocol)UnicastRemoteObject.exportObject(protocol, 0);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return stub;
@@ -156,7 +156,7 @@ public class Dht {
 	public static void gravarStubTxt(Protocol stub) {
 		ObjectOutputStream out = null;
 		try {
-			out = new ObjectOutputStream(new FileOutputStream(nodesListPath, true));
+			out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(nodesFile, true)));
 			out.writeObject(stub);
 			out.flush();
 			out.close();
@@ -169,20 +169,19 @@ public class Dht {
 		ObjectInputStream in = null;
 		boolean oef = false;
 		Protocol umObjeto = null;
-		in = new ObjectInputStream(new FileInputStream(nodesListPath));
+		in = new ObjectInputStream(new FileInputStream(nodesFile));
 		while (oef == false) {
 			try {
 				umObjeto = (Protocol) in.readObject();
-				stubList.add(umObjeto);           
+				if(!umObjeto.equals(null)) stubList.add(umObjeto);
 			}  catch (EOFException  eofException) {
 				in.close();
-				throw new QuitException();
-				//break;
+				break;
 			} catch (Exception e) {
 				System.out.println("Não foi possível ler o Arquivo com os Nós.");
 				in.close();
 				break;
-			}
+			} 
 		}
 		in.close();
 	}
