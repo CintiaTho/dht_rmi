@@ -40,10 +40,16 @@ public class Dht {
 			while (comando != "quit") {
 
 				//Sempre mantendo atualizado o tamanho da DHT para fins demonstrativos
-				leituraStubTxt(stubList, nodesFile);
+				stubList = leituraStubTxt(nodesFile);
 
 				//informacoes que sempre aparecerao ao usuario
 				System.out.println();
+				if(protocol == null) System.out.println("Não faz parte de uma DHT.");
+				else {
+					System.out.println("Nó: " + protocol.getFalsoID());
+					System.out.println("Existe(m): "+ stubList.size() + " Nós na DHT na qual você participa.");
+				}
+				
 				System.out.print("Comando: ");
 				comando = entrada.nextLine();
 				System.out.println();
@@ -77,7 +83,7 @@ public class Dht {
 						if(text.equals("s")){
 							//-------	
 							protocol = criarNodeDHT(protocol, algoritmoHash);
-							leituraStubTxt(stubList, nodesFile);
+							stubList = leituraStubTxt(nodesFile);
 							if(stubList.isEmpty()) {
 								protocol.setFalsoID(1);
 								stubList.add(protocol.getStub());
@@ -187,40 +193,21 @@ public class Dht {
 		}
 	}
 
-	/*public static void leituraStubTxt(ArrayList<Protocol> stubList, File nodesFile) throws IOException {
+	public static ArrayList<Protocol> leituraStubTxt(File nodesFile) throws IOException {
 		ObjectInputStream in = null;
-		boolean oef = false;
-		ArrayList<Protocol> objetos = null;
-		in = new ObjectInputStream(new FileInputStream(nodesFile));
-		while (oef == false) {
-			try {
-				objetos = (ArrayList<Protocol>) in.readObject();
-				if(objetos!=null) stubList = objetos;
-			}  catch (EOFException  eofException) {
-				in.close();
-				
-				break;
-			} catch (Exception e) {
-				System.out.println("Não foi possível ler o Arquivo com os Nós:" + e);
-				in.close();
-				break;
-			} 
-		}
-		in.close();
-	}*/
-	public static void leituraStubTxt(ArrayList<Protocol> stubList, File nodesFile) throws IOException {
-		ObjectInputStream in = null;
+		ArrayList<Protocol> objetos = new ArrayList<>();
 		try {
 			in = new ObjectInputStream(new FileInputStream(nodesFile));
-			stubList = (ArrayList<Protocol>) in.readObject();
-			in.close();
+			objetos = (ArrayList<Protocol>) in.readObject();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("ok");
+		//System.out.println("ok");
+		in.close();
+		return objetos;
 	}
 
 	public static int byteToInt(byte[] id) {
