@@ -160,10 +160,7 @@ public class Dht {
 					if(text.equals("s")){
 						//-------
 						if(protocol != null) protocol.leave();
-						protocol = null;
-						stubList.clear();
-						nodesFile = null;
-						throw new QuitException();
+						System.exit(0);
 						//-------
 					} else if(text.equals("n")) System.out.println("Operação cancelada!");
 					else System.out.println("Comando inválido, operação cancelada!");
@@ -173,8 +170,6 @@ public class Dht {
 					System.out.println("Este não é um comando válido!");
 				}
 			}	
-		} catch (QuitException e) {
-			System.out.println("Encerrada sua sessão com sucesso!");
 		} catch (Exception e) {
 			System.err.println("Ocorreu um erro no servidor: " + e.toString());
 		}
@@ -220,10 +215,6 @@ public class Dht {
 		return objetos;
 	}
 
-	public static int byteToInt(byte[] id) {
-		return id.hashCode();
-	}
-
 	//Retirado de<http://codare.aurelio.net/2007/02/02/java-gerando-codigos-hash-md5-sha/>
 	public static byte[] gerarHash(String frase, String algoritmoHash) {
 		try {
@@ -233,18 +224,6 @@ public class Dht {
 		} catch (NoSuchAlgorithmException e) {
 			return null;
 		}
-	}
-
-	//Retirado de<http://codare.aurelio.net/2007/02/02/java-gerando-codigos-hash-md5-sha/>
-	public static String stringHexa(byte[] bytes) {
-		StringBuilder s = new StringBuilder();
-		for (int i = 0; i < bytes.length; i++) {
-			int parteAlta = ((bytes[i] >> 4) & 0xf) << 4;
-			int parteBaixa = bytes[i] & 0xf;
-			if (parteAlta == 0) s.append('0');
-			s.append(Integer.toHexString(parteAlta | parteBaixa));
-		}
-		return s.toString();
 	}
 
 }
