@@ -48,7 +48,7 @@ public class Dht {
 				if(protocol == null) System.out.println("Não faz parte de uma DHT.");
 				else {
 					System.out.println("Nó: " + protocol.getFalsoID());
-					System.out.println("Existe(m): "+ stubList.size() + " Nós na DHT na qual você participa.");
+					System.out.println("Existe(m) aprox.: "+ stubList.size() + " Nós na DHT na qual você participa.");
 				}
 				System.out.print("Comando: ");
 				comando = entrada.nextLine();
@@ -81,25 +81,33 @@ public class Dht {
 							//-------	
 							protocol = criarNodeDHT(protocol, algoritmoHash);
 							stubList = leituraStubTxt(nodesFile);
-							if(stubList.isEmpty()) {
-								protocol.setFalsoID(1);
-								stubList.add(protocol.getStub());
-								gravarStubTxt(stubList, nodesFile);
-								System.out.println("Você é o primeiro nó na rede - Criada uma nova DHT!");	
-							}
 							//Unico erro a ser tratado será de tentar entrar na rede (um nó da lista) e descobrir que eles estão desativados...até ser necessário criar uma nova rede;
-							else {
-								for(Protocol nodes: stubList) {
-									try{
-										nodes.join();
-									}catch (ConnectException e) {
-										System.err.println("Problemas com o Registry: " + e.toString());
+							if(!stubList.isEmpty()) {
+								ArrayList<Protocol> remover = new ArrayList<>();
+								for(Protocol node: stubList) {
+									if(protocol.getFalsoID()==0) {
+										try{
+											node.join();
+											protocol.setFalsoID(stubList.size()+1);
+										}catch (ConnectException e) {
+											System.err.println("Nó inacessível: " + e.toString());
+											remover.add(node);
+										}
 									}
-									protocol.setFalsoID(stubList.size()+1);
-									stubList.add(protocol.getStub());
-									gravarStubTxt(stubList, nodesFile);
+								}
+								
+								for(Protocol node: remover) {
+									stubList.remove(node);
+									System.err.println("Nó removido: " + node.toString());
 								}
 							}
+							
+							if(stubList.isEmpty()) {
+								System.out.println("Você é o primeiro nó na rede - Criada uma nova DHT!");	
+								protocol.setFalsoID(1);
+							}
+							stubList.add(protocol.getStub());
+							gravarStubTxt(stubList, nodesFile);
 							//-------		
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
