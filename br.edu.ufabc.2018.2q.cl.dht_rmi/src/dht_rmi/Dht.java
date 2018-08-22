@@ -178,7 +178,7 @@ public class Dht {
 	public static void gravarStubTxt(ArrayList<Protocol> stubList, File nodesFile) {
 		ObjectOutputStream out = null;
 		try {
-			out = new ObjectOutputStream(new FileOutputStream(nodesFile, true));
+			out = new ObjectOutputStream(new FileOutputStream(nodesFile));
 			out.writeObject(stubList);
 			out.flush();
 			out.close();
@@ -187,7 +187,7 @@ public class Dht {
 		}
 	}
 
-	public static void leituraStubTxt(ArrayList<Protocol> stubList, File nodesFile) throws IOException {
+	/*public static void leituraStubTxt(ArrayList<Protocol> stubList, File nodesFile) throws IOException {
 		ObjectInputStream in = null;
 		boolean oef = false;
 		ArrayList<Protocol> objetos = null;
@@ -198,6 +198,7 @@ public class Dht {
 				if(objetos!=null) stubList = objetos;
 			}  catch (EOFException  eofException) {
 				in.close();
+				
 				break;
 			} catch (Exception e) {
 				System.out.println("Não foi possível ler o Arquivo com os Nós:" + e);
@@ -206,6 +207,20 @@ public class Dht {
 			} 
 		}
 		in.close();
+	}*/
+	public static void leituraStubTxt(ArrayList<Protocol> stubList, File nodesFile) throws IOException {
+		ObjectInputStream in = null;
+		try {
+			in = new ObjectInputStream(new FileInputStream(nodesFile));
+			stubList = (ArrayList<Protocol>) in.readObject();
+			in.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("ok");
 	}
 
 	public static int byteToInt(byte[] id) {
