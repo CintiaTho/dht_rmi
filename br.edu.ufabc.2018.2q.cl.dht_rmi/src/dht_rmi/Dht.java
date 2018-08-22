@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
@@ -49,7 +50,6 @@ public class Dht {
 					System.out.println("Nó: " + protocol.getFalsoID());
 					System.out.println("Existe(m): "+ stubList.size() + " Nós na DHT na qual você participa.");
 				}
-				
 				System.out.print("Comando: ");
 				comando = entrada.nextLine();
 				System.out.println();
@@ -58,14 +58,11 @@ public class Dht {
 				switch (comando){
 				case "commands":
 					if(protocol == null) {
-						System.out.println("Não faz parte de uma DHT.");
 						System.out.println("Gostaria de: ");
 						System.out.println("join - Participar de uma DHT;");
 						System.out.println("quit - Terminar esta sessão;");
 					}
 					else {
-						System.out.println("Nó: " + protocol.getFalsoID());
-						System.out.println("Existe(m): "+ stubList.size() + " Nós na DHT na qual você participa.");
 						System.out.println("Gostaria de: ");
 						System.out.println("leave - Sair da DHT;");
 						System.out.println("store - Guardar um nome na DHT;");
@@ -75,7 +72,7 @@ public class Dht {
 					break;
 					//-------------------------------------------------
 				case "join":
-					//Vamos fazer tudo usando um aArquivo txt local apenas para nossos testes, em uma situação "real" este arquivo seria disponibilizado para quem quer entrar na rede;
+					//Usando um Arquivo txt local apenas para nossos testes, em uma situação "real" este arquivo seria disponibilizado para quem quer entrar na rede;
 					//Quando um nó entrar na rede, ele pode gravar a si próprio, e quando sair da rede, apagar a si próprio do arquivo (na situação "real", ele gravaria o antecessor e o sucessor para tentar manter a lista)  
 					if(protocol==null) {
 						System.out.print("Quer realmente realizar esta ação? (s/n) ");
@@ -92,10 +89,16 @@ public class Dht {
 							}
 							//Unico erro a ser tratado será de tentar entrar na rede (um nó da lista) e descobrir que eles estão desativados...até ser necessário criar uma nova rede;
 							else {
-								protocol.setFalsoID(stubList.size()+1);
-								stubList.add(protocol.getStub());
-								gravarStubTxt(stubList, nodesFile);
-								Protocol primNode = stubList.get(0);
+								for(Protocol nodes: stubList) {
+									try{
+										nodes.join();
+									}catch (ConnectException e) {
+										System.err.println("Problemas com o Registry: " + e.toString());
+									}
+									protocol.setFalsoID(stubList.size()+1);
+									stubList.add(protocol.getStub());
+									gravarStubTxt(stubList, nodesFile);
+								}
 							}
 							//-------		
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
@@ -202,7 +205,6 @@ public class Dht {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		//System.out.println("ok");
