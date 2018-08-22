@@ -1,6 +1,5 @@
 package dht_rmi;
 
-import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,9 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import java.util.UUID;
 
 import classes.Node;
 import classes.NodeImpl;
@@ -24,24 +21,17 @@ import classes.ProtocolImpl;
 import classes.QuitException;
 
 public class Dht {
-	//Criacao de variaveis de trabalho dos metodos
-	static int falsoID;
-	static String texto = "";
-	static File nodesFile = new File("./src/dht_rmi/nodes_list.txt");
-	static String algoritmoHash = "MD5";
-	static byte[] id = null;
-	static Node node = null;
-	static Protocol protocol = null;
-	static Protocol stub = null;
-	static Protocol next_stub = null;
-	static Protocol ant_stub = null;
-	static ArrayList<Protocol> stubList = null;
 
 	public static void main(String[] args) {
+		//Criacao de variaveis de trabalho dos metodos dessa classe
+		Protocol protocol = null;
+		ArrayList<Protocol> stubList = new ArrayList<>();
+		File nodesFile = new File("./src/dht_rmi/nodes_list.txt");
+		String algoritmoHash = "MD5";
 		Scanner entrada = new Scanner(System.in);
 		String comando = "";
 		String text;
-		falsoID = -1;
+
 		//texto inicial explicativo sobre o funcionamento da interface
 		System.out.println("Digite: 'commands' para visualisar a lista de possíveis comandos permitidos ao usuário.");
 		System.out.println("Caso já os conheça, digite a primeira ação que deseja realizar e aperte enter...");
@@ -50,11 +40,7 @@ public class Dht {
 			while (comando != "quit") {
 
 				//Sempre mantendo atualizado o tamanho da DHT para fins demonstrativos
-				//if(falsoID >= 0) 
-				try {
-					leituraStubTxt();
-				}  catch (EOFException  eofException) {
-				}
+				leituraStubTxt(stubList, nodesFile);
 
 				//informacoes que sempre aparecerao ao usuario
 				System.out.println();
@@ -65,14 +51,14 @@ public class Dht {
 				//switch-case dos comandos possiveis
 				switch (comando){
 				case "commands":
-					if(falsoID < 0) {
+					if(protocol == null) {
 						System.out.println("Não faz parte de uma DHT.");
 						System.out.println("Gostaria de: ");
 						System.out.println("join - Participar de uma DHT;");
 						System.out.println("quit - Terminar esta sessão;");
 					}
 					else {
-						System.out.println("Nó: " + falsoID);
+						System.out.println("Nó: " + protocol.getFalsoID());
 						System.out.println("Existe(m): "+ stubList.size() + " Nós na DHT na qual você participa.");
 						System.out.println("Gostaria de: ");
 						System.out.println("leave - Sair da DHT;");
@@ -85,53 +71,66 @@ public class Dht {
 				case "join":
 					//Vamos fazer tudo usando um aArquivo txt local apenas para nossos testes, em uma situação "real" este arquivo seria disponibilizado para quem quer entrar na rede;
 					//Quando um nó entrar na rede, ele pode gravar a si próprio, e quando sair da rede, apagar a si próprio do arquivo (na situação "real", ele gravaria o antecessor e o sucessor para tentar manter a lista)  
-					if(falsoID<0) {
+					if(protocol==null) {
 						System.out.print("Quer realmente realizar esta ação? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
-							criarNodeDHT();
-							leituraStubTxt();
-							falsoID = stubList.size()+1;
-							if(falsoID==1) {
+							//-------	
+							protocol = criarNodeDHT(protocol, algoritmoHash);
+							leituraStubTxt(stubList, nodesFile);
+							if(stubList.isEmpty()) {
+								protocol.setFalsoID(1);
+								stubList.add(protocol.getStub());
+								gravarStubTxt(stubList, nodesFile);
 								System.out.println("Você é o primeiro nó na rede - Criada uma nova DHT!");	
 							}
 							//Unico erro a ser tratado será de tentar entrar na rede (um nó da lista) e descobrir que eles estão desativados...até ser necessário criar uma nova rede;
 							else {
+								protocol.setFalsoID(stubList.size()+1);
+								stubList.add(protocol.getStub());
+								gravarStubTxt(stubList, nodesFile);
 								Protocol primNode = stubList.get(0);
 							}
+							//-------		
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
 					} else System.out.println("Comando inválido, você já pertence à uma DHT!");
 					break;
 					//-------------------------------------------------
 				case "leave":
-					if(falsoID>=0) {
+					if(protocol!=null) {
 						System.out.print("Quer realmente realizar esta ação? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
-							
+							//-------	
+
+							//-------	
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
 					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
 					break;
 					//-------------------------------------------------
 				case "store":
-					if(falsoID>=0) {
+					if(protocol!=null) {
 						System.out.print("Quer realmente realizar esta ação? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
-							
+							//-------	
+
+							//-------
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
 					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
 					break;	
 					//-------------------------------------------------
 				case "retrieve":
-					if(falsoID>=0) {
+					if(protocol!=null) {
 						System.out.print("Quer realmente realizar esta ação? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
-							
+							//-------
+
+							//-------
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
 					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
@@ -142,11 +141,16 @@ public class Dht {
 					System.out.print("Deseja realmente terminar sua sessão?(s/n) ");
 					text = entrada.nextLine();
 					if(text.equals("s")){
-
+						//-------
+						if(protocol != null) protocol.leave();
+						protocol = null;
+						stubList.clear();
+						nodesFile = null;
 						throw new QuitException();
-					}
-					else if(text.equals("n")) System.out.println("Operação cancelada!");
+						//-------
+					} else if(text.equals("n")) System.out.println("Operação cancelada!");
 					else System.out.println("Comando inválido, operação cancelada!");
+					break;	
 					//-------------------------------------------------
 				default:
 					System.out.println("Este não é um comando válido!");
@@ -159,30 +163,22 @@ public class Dht {
 		}
 	}
 
-	public static void criarNodeDHT() {
-		texto = gerarStringRandom();
-		id = gerarHash(texto);
-		node = new NodeImpl(id);
+	public static Protocol criarNodeDHT(Protocol protocol, String algoritmoHash) {
+		Node node = new NodeImpl();
 		protocol = new ProtocolImpl(node);
-		stub = gerarStub(protocol);
-		stubList.add(stub);
-		gravarStubTxt(stubList);
-	}
-
-	public static Protocol gerarStub(Protocol protocol) {
-		Protocol stub = null;
 		try {
-			stub = (Protocol)UnicastRemoteObject.exportObject(protocol, 0);
+			protocol.setStub((Protocol)UnicastRemoteObject.exportObject(protocol, 0));
+			protocol.getNode().setMyid(gerarHash(protocol.getStub().toString(),algoritmoHash));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		return stub;
+		return protocol;
 	}
 
-	public static void gravarStubTxt(List<Protocol> stubList) {
+	public static void gravarStubTxt(ArrayList<Protocol> stubList, File nodesFile) {
 		ObjectOutputStream out = null;
 		try {
-			out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(nodesFile)));
+			out = new ObjectOutputStream(new FileOutputStream(nodesFile, true));
 			out.writeObject(stubList);
 			out.flush();
 			out.close();
@@ -191,7 +187,7 @@ public class Dht {
 		}
 	}
 
-	public static void leituraStubTxt() throws IOException {
+	public static void leituraStubTxt(ArrayList<Protocol> stubList, File nodesFile) throws IOException {
 		ObjectInputStream in = null;
 		boolean oef = false;
 		ArrayList<Protocol> objetos = null;
@@ -199,12 +195,12 @@ public class Dht {
 		while (oef == false) {
 			try {
 				objetos = (ArrayList<Protocol>) in.readObject();
-				if(!objetos.equals(null)) stubList = objetos;
+				if(objetos!=null) stubList = objetos;
 			}  catch (EOFException  eofException) {
 				in.close();
 				break;
 			} catch (Exception e) {
-				System.out.println("Não foi possível ler o Arquivo com os Nós.");
+				System.out.println("Não foi possível ler o Arquivo com os Nós:" + e);
 				in.close();
 				break;
 			} 
@@ -212,13 +208,12 @@ public class Dht {
 		in.close();
 	}
 
-	public static String gerarStringRandom() {
-		UUID uuid = UUID.randomUUID();
-		return uuid.toString();
+	public static int byteToInt(byte[] id) {
+		return id.hashCode();
 	}
 
 	//Retirado de<http://codare.aurelio.net/2007/02/02/java-gerando-codigos-hash-md5-sha/>
-	public static byte[] gerarHash(String frase) {
+	public static byte[] gerarHash(String frase, String algoritmoHash) {
 		try {
 			MessageDigest md = MessageDigest.getInstance(algoritmoHash);
 			md.update(frase.getBytes());
@@ -226,10 +221,6 @@ public class Dht {
 		} catch (NoSuchAlgorithmException e) {
 			return null;
 		}
-	}
-
-	public static int byteToInt(byte[] id) {
-		return id.hashCode();
 	}
 
 	//Retirado de<http://codare.aurelio.net/2007/02/02/java-gerando-codigos-hash-md5-sha/>

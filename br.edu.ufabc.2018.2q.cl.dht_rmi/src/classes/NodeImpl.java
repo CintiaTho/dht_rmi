@@ -8,10 +8,11 @@ public class NodeImpl implements Node {
 	private byte[] myid;
 	private HashMap <byte[], String> texts;
 	
-	public NodeImpl(byte[] myid) {
-		this.myid = myid;
+	public NodeImpl() {
+		super();
+		myid = null;
+		texts = null;
 	}
-	
 	public byte[] getMyid() {
 		return myid;
 	}
