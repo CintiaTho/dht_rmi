@@ -3,7 +3,7 @@ package classes;
 import java.rmi.RemoteException;
 
 public class ProtocolImpl implements Protocol {
-	private int falsoID;
+	private String falsoID;
 	private Node node;
 	private Protocol stub;
 	private Protocol next_stub;
@@ -11,17 +11,17 @@ public class ProtocolImpl implements Protocol {
 	
 	public ProtocolImpl(Node node) {
 		this.node = node;
-		falsoID = 0;
+		falsoID = "";
 		stub = null;
 		next_stub = null;
 		ant_stub = null;
 	}
 	
-	public int getFalsoID() {
+	public String getFalsoID() {
 		return falsoID;
 	}
 
-	public void setFalsoID(int falsoID) {
+	public void setFalsoID(String falsoID) {
 		this.falsoID = falsoID;
 	}
 
@@ -31,22 +31,6 @@ public class ProtocolImpl implements Protocol {
 
 	public void setStub(Protocol stub) {
 		this.stub = stub;
-	}
-
-	public Protocol getNext_stub() {
-		return next_stub;
-	}
-
-	public void setNext_stub(Protocol next_stub) {
-		this.next_stub = next_stub;
-	}
-
-	public Protocol getAnt_stub() {
-		return ant_stub;
-	}
-
-	public void setAnt_stub(Protocol ant_stub) {
-		this.ant_stub = ant_stub;
 	}
 
 	public Node getNode() {

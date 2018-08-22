@@ -1,14 +1,17 @@
 package dht_rmi;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
+import java.rmi.UnknownHostException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +22,6 @@ import classes.Node;
 import classes.NodeImpl;
 import classes.Protocol;
 import classes.ProtocolImpl;
-import classes.QuitException;
 
 public class Dht {
 
@@ -85,12 +87,10 @@ public class Dht {
 							if(!stubList.isEmpty()) {
 								ArrayList<Protocol> remover = new ArrayList<>();
 								for(Protocol node: stubList) {
-									if(protocol.getFalsoID()==0) {
+									if(true) {
 										try{
 											node.join();
-											protocol.setFalsoID(stubList.size()+1);
 										}catch (ConnectException e) {
-											System.err.println("Nó inacessível: " + e.toString());
 											remover.add(node);
 										}
 									}
@@ -104,7 +104,6 @@ public class Dht {
 							
 							if(stubList.isEmpty()) {
 								System.out.println("Você é o primeiro nó na rede - Criada uma nova DHT!");	
-								protocol.setFalsoID(1);
 							}
 							stubList.add(protocol.getStub());
 							gravarStubTxt(stubList, nodesFile);
@@ -120,7 +119,7 @@ public class Dht {
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------	
-
+							protocol.leave();
 							//-------	
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
@@ -133,7 +132,7 @@ public class Dht {
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------	
-
+							//protocol.store(key, value, hash);
 							//-------
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
@@ -146,7 +145,7 @@ public class Dht {
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
-
+							//String value = protocol.retrieve(key, hash);
 							//-------
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
@@ -160,6 +159,7 @@ public class Dht {
 					if(text.equals("s")){
 						//-------
 						if(protocol != null) protocol.leave();
+						System.out.println("Sessão Finalizada!");
 						System.exit(0);
 						//-------
 					} else if(text.equals("n")) System.out.println("Operação cancelada!");
@@ -178,9 +178,13 @@ public class Dht {
 	public static Protocol criarNodeDHT(Protocol protocol, String algoritmoHash) {
 		Node node = new NodeImpl();
 		protocol = new ProtocolImpl(node);
+		
 		try {
 			protocol.setStub((Protocol)UnicastRemoteObject.exportObject(protocol, 0));
-			protocol.getNode().setMyid(gerarHash(protocol.getStub().toString(),algoritmoHash));
+			String myStub = protocol.getStub().toString();
+			BigInteger id = new BigInteger(gerarHash(myStub,algoritmoHash));
+			protocol.getNode().setMyid(id);
+			protocol.setFalsoID(myStub.substring(77, 96));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -215,7 +219,6 @@ public class Dht {
 		return objetos;
 	}
 
-	//Retirado de<http://codare.aurelio.net/2007/02/02/java-gerando-codigos-hash-md5-sha/>
 	public static byte[] gerarHash(String frase, String algoritmoHash) {
 		try {
 			MessageDigest md = MessageDigest.getInstance(algoritmoHash);
