@@ -1,5 +1,5 @@
 /**
- * QuitException para finalizar a operação.
+ * QuitException para finalizar a operacao.
  */
 
 /**
@@ -9,6 +9,7 @@
 
 package classes;
 
+@SuppressWarnings("serial")
 public class QuitException extends RuntimeException {
 
 }

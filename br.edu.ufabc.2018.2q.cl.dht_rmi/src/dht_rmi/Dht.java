@@ -1,3 +1,12 @@
+/**
+ * Implementacao de um sistema DHT.
+ */
+
+/**
+ * @author Cintia Lumi Tho - RA 1103514
+ * @author Luiz Felipe M. Garcia - RA 11028613
+ */
+
 package dht_rmi;
 
 import java.io.File;
@@ -7,11 +16,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
-import java.rmi.UnknownHostException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -39,16 +45,16 @@ public class Dht {
 		String text;
 
 		//texto inicial explicativo sobre o funcionamento da interface
-		System.out.println("Digite: 'commands' para visualisar a lista de possíveis comandos permitidos ao usuário.");
-		System.out.println("Caso já os conheça, digite a primeira ação que deseja realizar e aperte enter...");
+		System.out.println("Digite: 'commands' para visualisar a lista de possiveis comandos permitidos ao usuario.");
+		System.out.println("Caso ja os conheca, digite a primeira acao que deseja realizar e aperte enter...");
 		try {	
 			//loop principal para receber os comandos do usuario e mostrar informacoes
 			while (comando != "quit") {
 				//informacoes que sempre aparecerao ao usuario
 				System.out.println();
-				if(protocol == null) System.out.println("Não faz parte de uma DHT.");
+				if(protocol == null) System.out.println("Nao faz parte de uma DHT.");
 				else {
-					System.out.println("Nó: " + protocol.getFalsoID());
+					System.out.println("No: " + protocol.getFalsoID());
 				}
 				System.out.print("Comando: ");
 				comando = entrada.nextLine();
@@ -60,7 +66,7 @@ public class Dht {
 					if(protocol == null) {
 						System.out.println("Gostaria de: ");
 						System.out.println("join - Participar de uma DHT;");
-						System.out.println("quit - Terminar esta sessão;");
+						System.out.println("quit - Terminar esta sessao;");
 					}
 					else {
 						System.out.println("Gostaria de: ");
@@ -69,23 +75,23 @@ public class Dht {
 						System.out.println("retrieve - buscar um item na DHT;");
 						System.out.println("delete - apagar um item na DHT;");
 						System.out.println("viewDHT - visualizar a DHT;");
-						System.out.println("quit - Terminar esta sessão.");
+						System.out.println("quit - Terminar esta sessao.");
 					}
 					break;
 					//-------------------------------------------------
 				case "join":
-					//Usando um Arquivo txt local compartilhado apenas para nossos testes, em uma situação "real" este arquivo seria disponibilizado "online" para quem quer entrar na rede;
-					//Quando um nó entrar na rede, ele grava a si próprio, e quando sair da rede não apaga a si próprio do arquivo (na situação "real", ele gravaria o antecessor e o sucessor para tentar manter a lista)  
+					//Usando um Arquivo txt local compartilhado apenas para nossos testes, em uma situacao "real" este arquivo seria disponibilizado "online" para quem quer entrar na rede;
+					//Quando um no entrar na rede, ele grava a si proprio, e quando sair da rede nao apaga a si proprio do arquivo (na situacao "real", ele gravaria o antecessor e o sucessor para tentar manter a lista)
 					if(protocol==null) {
-						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
-							//Cria o nó (cria o ID e Stub)
+							//Cria o no (cria o ID e Stub)
 							protocol = criarNodeDHT(protocol, algoritmoHash);
 							
-							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nós da lista e caso um estáejadesativado - retira da lista
-							//Faz isso até achar um stub disponível ou até ser necessário criar uma nova rede;
+							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
+							//Faz isso ate achar um stub disponivel ou ate ser necessario criar uma nova rede;
 							stubList = leituraStubTxt(nodesFile);
 							if(!stubList.isEmpty()) {
 								//lista de apoio para retirada de itens inativos da lista de stubs
@@ -94,7 +100,7 @@ public class Dht {
 								for(Protocol node: stubList) {
 									if(!teste) {
 										try{
-											//tentativa de entrar na rede começando pelo nó da lista (mais antigo para o mais novo)
+											//tentativa de entrar na rede comecando pelo no da lista (mais antigo para o mais novo)
 											teste = node.join();
 										}catch (ConnectException e) {
 											//caso inativo
@@ -105,107 +111,109 @@ public class Dht {
 								//remove os stubs conhecidamente inativos
 								for(Protocol node: remover) {
 									stubList.remove(node);
-									System.err.println("Nó removido: " + node.toString());
+									System.err.println("No removido: " + node.toString());
 								}
 							}
 							
-							//insere o nó na lista de stubs e atualiza o arquivo TXT
+							//insere o no na lista de stubs e atualiza o arquivo TXT
 							if(stubList.isEmpty()) {
-								System.out.println("Você é o primeiro nó na rede - Criada uma nova DHT!");	
+								System.out.println("Voce e o primeiro no na rede - Criada uma nova DHT!");
 							}
 							stubList.add(protocol.getStub());
 							gravarStubTxt(stubList, nodesFile);
 							//-------		
-						} else if(text.equals("n")) System.out.println("Operação cancelada!");
-						else System.out.println("Comando inválido, operação cancelada!");
-					} else System.out.println("Comando inválido, você já pertence à uma DHT!");
+						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
+						else System.out.println("Comando invalido, operacao cancelada!");
+					} else System.out.println("Comando invalido, voce ja pertence a uma DHT!");
 					break;
 					//-------------------------------------------------
 				case "leave":
 					if(protocol!=null) {
-						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------	
 							protocol.leave();
 							//-------	
-						} else if(text.equals("n")) System.out.println("Operação cancelada!");
-						else System.out.println("Comando inválido, operação cancelada!");
-					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
+						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
+						else System.out.println("Comando invalido, operacao cancelada!");
+					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
 					break;
 					//-------------------------------------------------
 				case "store":
 					if(protocol!=null) {
-						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------	
 							//protocol.store(key, value, hash);
 							//-------
-						} else if(text.equals("n")) System.out.println("Operação cancelada!");
-						else System.out.println("Comando inválido, operação cancelada!");
-					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
+						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
+						else System.out.println("Comando invalido, operacao cancelada!");
+					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
 					break;	
 					//-------------------------------------------------
 				case "retrieve":
 					if(protocol!=null) {
-						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
 							//String value = protocol.retrieve(key, hash);
 							//-------
-						} else if(text.equals("n")) System.out.println("Operação cancelada!");
-						else System.out.println("Comando inválido, operação cancelada!");
-					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
+						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
+						else System.out.println("Comando invalido, operacao cancelada!");
+					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
 					break;	
 					//-------------------------------------------------
 				case "delete":
 					if(protocol!=null) {
-						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
 							//protocol.delete(key, hash);
 							//-------
-						} else if(text.equals("n")) System.out.println("Operação cancelada!");
-						else System.out.println("Comando inválido, operação cancelada!");
-					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
+						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
+						else System.out.println("Comando invalido, operacao cancelada!");
+					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
 					break;	
 					//-------------------------------------------------
 				case "viewDHT":
 					if(protocol!=null) {
-						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
 							//ArrayList view = protocol.view();
 							//-------
-						} else if(text.equals("n")) System.out.println("Operação cancelada!");
-						else System.out.println("Comando inválido, operação cancelada!");
-					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
+						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
+						else System.out.println("Comando invalido, operacao cancelada!");
+					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
 					break;	
 					//-------------------------------------------------
 				case "quit":
-					System.out.println("Seus dados serão perdidos e sua posição atual na DHT!"); 
-					System.out.print("Deseja realmente terminar sua sessão?(s/n) ");
+					System.out.println("Seus dados serao perdidos e sua posicao atual na DHT!");
+					System.out.print("Deseja realmente terminar sua sessao?(s/n) ");
 					text = entrada.nextLine();
 					if(text.equals("s")){
 						//-------
 						if(protocol != null) protocol.leave();
-						System.out.println("Sessão Finalizada!");
+						System.out.println("Sessao Finalizada!");
 						System.exit(0);
 						//-------
-					} else if(text.equals("n")) System.out.println("Operação cancelada!");
-					else System.out.println("Comando inválido, operação cancelada!");
+					} else if(text.equals("n")) System.out.println("Operacao cancelada!");
+					else System.out.println("Comando invalido, operacao cancelada!");
 					break;	
 					//-------------------------------------------------
 				default:
-					System.out.println("Este não é um comando válido!");
+					System.out.println("Este nao e um comando valido!");
 				}
 			}	
 		} catch (Exception e) {
 			System.err.println("Ocorreu um erro no servidor: " + e.toString());
+		} finally {
+			if(entrada != null) entrada.close();
 		}
 	}
 
@@ -236,7 +244,7 @@ public class Dht {
 			out.flush();
 			out.close();
 		} catch (IOException ex) {
-			System.out.println("Não foi possível gravar");
+			System.out.println("Nao foi possivel gravar");
 		}
 	}
 
