@@ -41,16 +41,11 @@ public class Dht {
 		try {	
 			//loop principal para receber os comandos do usuario e mostrar informacoes
 			while (comando != "quit") {
-
-				//Sempre mantendo atualizado o tamanho da DHT para fins demonstrativos
-				stubList = leituraStubTxt(nodesFile);
-
 				//informacoes que sempre aparecerao ao usuario
 				System.out.println();
 				if(protocol == null) System.out.println("Não faz parte de uma DHT.");
 				else {
 					System.out.println("Nó: " + protocol.getFalsoID());
-					System.out.println("Existe(m) aprox.: "+ stubList.size() + " Nós na DHT na qual você participa.");
 				}
 				System.out.print("Comando: ");
 				comando = entrada.nextLine();
@@ -67,8 +62,10 @@ public class Dht {
 					else {
 						System.out.println("Gostaria de: ");
 						System.out.println("leave - Sair da DHT;");
-						System.out.println("store - Guardar um nome na DHT;");
-						System.out.println("retrieve - buscar um nome na DHT;");
+						System.out.println("store - Guardar um item na DHT;");
+						System.out.println("retrieve - buscar um item na DHT;");
+						System.out.println("delete - apagar um item na DHT;");
+						System.out.println("viewDHT - visualizar a DHT;");
 						System.out.println("quit - Terminar esta sessão.");
 					}
 					break;
@@ -86,10 +83,11 @@ public class Dht {
 							//Unico erro a ser tratado será de tentar entrar na rede (um nó da lista) e descobrir que eles estão desativados...até ser necessário criar uma nova rede;
 							if(!stubList.isEmpty()) {
 								ArrayList<Protocol> remover = new ArrayList<>();
+								Boolean teste = false;
 								for(Protocol node: stubList) {
-									if(true) {
+									if(!teste) {
 										try{
-											node.join();
+											teste = node.join();
 										}catch (ConnectException e) {
 											remover.add(node);
 										}
@@ -146,6 +144,32 @@ public class Dht {
 						if(text.equals("s")){
 							//-------
 							//String value = protocol.retrieve(key, hash);
+							//-------
+						} else if(text.equals("n")) System.out.println("Operação cancelada!");
+						else System.out.println("Comando inválido, operação cancelada!");
+					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
+					break;	
+					//-------------------------------------------------
+				case "delete":
+					if(protocol!=null) {
+						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						text = entrada.nextLine();
+						if(text.equals("s")){
+							//-------
+							//protocol.delete(key, hash);
+							//-------
+						} else if(text.equals("n")) System.out.println("Operação cancelada!");
+						else System.out.println("Comando inválido, operação cancelada!");
+					} else System.out.println("Comando inválido, você não pertence à uma DHT!");
+					break;	
+					//-------------------------------------------------
+				case "viewDHT":
+					if(protocol!=null) {
+						System.out.print("Quer realmente realizar esta ação? (s/n) ");
+						text = entrada.nextLine();
+						if(text.equals("s")){
+							//-------
+							//ArrayList view = protocol.view();
 							//-------
 						} else if(text.equals("n")) System.out.println("Operação cancelada!");
 						else System.out.println("Comando inválido, operação cancelada!");
