@@ -28,9 +28,12 @@ public class Dht {
 	public static void main(String[] args) {
 		//Criacao de variaveis de trabalho dos metodos dessa classe
 		Protocol protocol = null;
+		
 		ArrayList<Protocol> stubList = new ArrayList<>();
 		File nodesFile = new File("./src/dht_rmi/nodes_list.txt");
+		
 		String algoritmoHash = "MD5";
+		
 		Scanner entrada = new Scanner(System.in);
 		String comando = "";
 		String text;
@@ -71,35 +74,42 @@ public class Dht {
 					break;
 					//-------------------------------------------------
 				case "join":
-					//Usando um Arquivo txt local apenas para nossos testes, em uma situação "real" este arquivo seria disponibilizado para quem quer entrar na rede;
-					//Quando um nó entrar na rede, ele pode gravar a si próprio, e quando sair da rede, apagar a si próprio do arquivo (na situação "real", ele gravaria o antecessor e o sucessor para tentar manter a lista)  
+					//Usando um Arquivo txt local compartilhado apenas para nossos testes, em uma situação "real" este arquivo seria disponibilizado "online" para quem quer entrar na rede;
+					//Quando um nó entrar na rede, ele grava a si próprio, e quando sair da rede não apaga a si próprio do arquivo (na situação "real", ele gravaria o antecessor e o sucessor para tentar manter a lista)  
 					if(protocol==null) {
 						System.out.print("Quer realmente realizar esta ação? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
-							//-------	
+							//-------
+							//Cria o nó (cria o ID e Stub)
 							protocol = criarNodeDHT(protocol, algoritmoHash);
+							
+							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nós da lista e caso um estáejadesativado - retira da lista
+							//Faz isso até achar um stub disponível ou até ser necessário criar uma nova rede;
 							stubList = leituraStubTxt(nodesFile);
-							//Unico erro a ser tratado será de tentar entrar na rede (um nó da lista) e descobrir que eles estão desativados...até ser necessário criar uma nova rede;
 							if(!stubList.isEmpty()) {
+								//lista de apoio para retirada de itens inativos da lista de stubs
 								ArrayList<Protocol> remover = new ArrayList<>();
 								Boolean teste = false;
 								for(Protocol node: stubList) {
 									if(!teste) {
 										try{
+											//tentativa de entrar na rede começando pelo nó da lista (mais antigo para o mais novo)
 											teste = node.join();
 										}catch (ConnectException e) {
+											//caso inativo
 											remover.add(node);
 										}
 									}
 								}
-								
+								//remove os stubs conhecidamente inativos
 								for(Protocol node: remover) {
 									stubList.remove(node);
 									System.err.println("Nó removido: " + node.toString());
 								}
 							}
 							
+							//insere o nó na lista de stubs e atualiza o arquivo TXT
 							if(stubList.isEmpty()) {
 								System.out.println("Você é o primeiro nó na rede - Criada uma nova DHT!");	
 							}
@@ -204,10 +214,13 @@ public class Dht {
 		protocol = new ProtocolImpl(node);
 		
 		try {
+			//criar o Stub
 			protocol.setStub((Protocol)UnicastRemoteObject.exportObject(protocol, 0));
 			String myStub = protocol.getStub().toString();
+			//criar o ID
 			BigInteger id = new BigInteger(gerarHash(myStub,algoritmoHash));
 			protocol.getNode().setMyid(id);
+			//criar o FalsoID (apenas demonstrativo)
 			protocol.setFalsoID(myStub.substring(77, 96));
 		} catch (RemoteException e) {
 			e.printStackTrace();
