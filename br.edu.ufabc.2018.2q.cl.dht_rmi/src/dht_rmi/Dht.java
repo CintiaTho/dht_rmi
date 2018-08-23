@@ -101,7 +101,7 @@ public class Dht {
 									if(!teste) {
 										try{
 											//tentativa de entrar na rede comecando pelo no da lista (mais antigo para o mais novo)
-											teste = node.join();
+											teste = node.join(protocol.getStub(), protocol.getNode().getMyid());
 										}catch (ConnectException e) {
 											//caso inativo
 											remover.add(node);
@@ -145,8 +145,15 @@ public class Dht {
 						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
-							//-------	
-							//protocol.store(key, value, hash);
+							//-------
+							System.out.print("Informe a chave que será utilizada para recuperar o item posteriormente: ");
+							text = entrada.nextLine();
+							String keyText = text;
+							BigInteger key = gerarID(keyText, algoritmoHash);
+							System.out.print("Informe o valor que será atribuído a chave previamente informada: ");
+							text = entrada.nextLine();
+							String value = text;
+							protocol.store(key, value);
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -216,17 +223,16 @@ public class Dht {
 			if(entrada != null) entrada.close();
 		}
 	}
-
+	//Metodo usado para criar o nó atrelado a aplicacao instanciada 
 	public static Protocol criarNodeDHT(Protocol protocol, String algoritmoHash) {
 		Node node = new NodeImpl();
 		protocol = new ProtocolImpl(node);
-		
 		try {
 			//criar o Stub
 			protocol.setStub((Protocol)UnicastRemoteObject.exportObject(protocol, 0));
 			String myStub = protocol.getStub().toString();
 			//criar o ID
-			BigInteger id = new BigInteger(gerarHash(myStub,algoritmoHash));
+			BigInteger id = gerarID(myStub,algoritmoHash);
 			protocol.getNode().setMyid(id);
 			//criar o FalsoID (apenas demonstrativo)
 			protocol.setFalsoID(myStub.substring(77, 96));
@@ -235,7 +241,8 @@ public class Dht {
 		}
 		return protocol;
 	}
-
+	
+	//Metodo que efetua a atualizacao do arquivo TXT
 	public static void gravarStubTxt(ArrayList<Protocol> stubList, File nodesFile) {
 		ObjectOutputStream out = null;
 		try {
@@ -247,7 +254,8 @@ public class Dht {
 			System.out.println("Nao foi possivel gravar");
 		}
 	}
-
+	
+	//Metodo que le e copia todos os itens armazenados no TXT
 	public static ArrayList<Protocol> leituraStubTxt(File nodesFile) throws IOException {
 		ObjectInputStream in = null;
 		ArrayList<Protocol> objetos = new ArrayList<>();
@@ -259,16 +267,16 @@ public class Dht {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		//System.out.println("ok");
 		in.close();
 		return objetos;
 	}
-
-	public static byte[] gerarHash(String frase, String algoritmoHash) {
+	
+	//Metodo para gerar os IDs seguramente criptografados - tanto para os nós quanto para os itens
+	public static BigInteger gerarID(String frase, String algoritmoHash) {
 		try {
 			MessageDigest md = MessageDigest.getInstance(algoritmoHash);
 			md.update(frase.getBytes());
-			return md.digest();
+			return new BigInteger(md.digest());
 		} catch (NoSuchAlgorithmException e) {
 			return null;
 		}

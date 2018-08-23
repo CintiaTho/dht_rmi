@@ -9,6 +9,7 @@
 
 package classes;
 
+import java.math.BigInteger;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -26,7 +27,7 @@ public interface Protocol extends Remote {
 
 	public void setNode(Node node) throws RemoteException;
 	
-	public boolean join() throws RemoteException;
+	public boolean join(Protocol protocol, BigInteger bigInteger) throws RemoteException;
 	
 	public boolean join_ok() throws RemoteException;
 	
@@ -36,7 +37,7 @@ public interface Protocol extends Remote {
 	
 	public boolean node_gone() throws RemoteException;
 	
-	public boolean store() throws RemoteException;
+	public boolean store(BigInteger key, String value) throws RemoteException;
 	
 	public boolean retrieve() throws RemoteException;
 	

@@ -9,6 +9,7 @@
 
 package classes;
 
+import java.math.BigInteger;
 import java.rmi.RemoteException;
 
 public class ProtocolImpl implements Protocol {
@@ -50,8 +51,7 @@ public class ProtocolImpl implements Protocol {
 		this.node = node;
 	}
 
-	@Override
-	public boolean join() throws RemoteException {
+	public boolean join(Protocol protocol, BigInteger bigInteger) throws RemoteException {
 		// TODO Auto-generated method stub
 		return true;
 	}
@@ -63,7 +63,7 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	@Override
-	public boolean store() throws RemoteException {
+	public boolean store(BigInteger key, String value) throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
