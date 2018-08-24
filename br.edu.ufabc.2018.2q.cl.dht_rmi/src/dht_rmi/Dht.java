@@ -231,7 +231,8 @@ public class Dht {
 			if(entrada != null) entrada.close();
 		}
 	}
-	//Metodo usado para criar o nó atrelado a aplicacao instanciada 
+	
+	//Metodo usado para criar o nó atrelado a aplicacao instanciada (rodando localmente) 
 	public static Protocol criarNodeDHT(Protocol protocol, String algoritmoHash) {
 		Node node = new NodeImpl();
 		protocol = new ProtocolImpl(node);

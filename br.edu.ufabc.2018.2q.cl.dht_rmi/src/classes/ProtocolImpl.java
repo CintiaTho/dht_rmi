@@ -58,7 +58,7 @@ public class ProtocolImpl implements Protocol {
 			nextStub = newStub;
 			newStub.join_ok(nextStub, antStub);
 		}
-		//Quando o id do nó ingresante é maior que o seu -> envia ara o seu sucessor tratar
+		//Quando o id do nó ingresante é maior que o seu -> envia para o seu sucessor tratar
 		else if(getNode().getMyid().compareTo(newId) == -1){
 			nextStub.join(newStub, newId);
 		}
@@ -75,13 +75,37 @@ public class ProtocolImpl implements Protocol {
 		}
 		return true;
 	}
+	
+	public boolean join_ok(Protocol nextStub, Protocol antStub) throws RemoteException {
+		this.antStub = antStub;
+		this.nextStub = nextStub;
+		return true;
+	}
 
+	@Override
+	public boolean new_node(Protocol newStub) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	@Override
 	public boolean leave() throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
+	@Override
+	public boolean node_gone() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public boolean transfer() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	@Override
 	public boolean store(BigInteger key, String value) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -94,24 +118,6 @@ public class ProtocolImpl implements Protocol {
 		return false;
 	}
 
-	public boolean join_ok(Protocol nextStub, Protocol antStub) throws RemoteException {
-		this.antStub = antStub;
-		this.nextStub = nextStub;
-		return true;
-	}
-
-	@Override
-	public boolean new_node() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean node_gone() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	@Override
 	public boolean ok() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -120,12 +126,6 @@ public class ProtocolImpl implements Protocol {
 
 	@Override
 	public boolean not_found() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean transfer() throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}

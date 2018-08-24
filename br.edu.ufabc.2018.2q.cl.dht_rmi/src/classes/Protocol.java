@@ -31,11 +31,13 @@ public interface Protocol extends Remote {
 	
 	public boolean join_ok(Protocol nextStub, Protocol antStub) throws RemoteException;
 	
-	public boolean new_node() throws RemoteException;
+	public boolean new_node(Protocol newStub) throws RemoteException;
 	
 	public boolean leave() throws RemoteException;
 	
 	public boolean node_gone() throws RemoteException;
+	
+	public boolean transfer() throws RemoteException;
 	
 	public boolean store(BigInteger key, String value) throws RemoteException;
 	
@@ -44,8 +46,6 @@ public interface Protocol extends Remote {
 	public boolean ok() throws RemoteException;
 	
 	public boolean not_found() throws RemoteException;
-	
-	public boolean transfer() throws RemoteException;
 
 	public void delete(BigInteger key) throws RemoteException;
 }
