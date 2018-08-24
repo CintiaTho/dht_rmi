@@ -18,13 +18,17 @@ public class ProtocolImpl implements Protocol {
 	private Protocol myStub;
 	private Protocol nextStub;
 	private Protocol antStub;
+	private BigInteger nextID;
+	private BigInteger antID;
 
 	public ProtocolImpl(Node node) {
 		this.node = node;
 		falsoID = "";
 		myStub = null;
 		nextStub = null;
+		nextID = 0;
 		antStub = null;
+		antID = 0;
 	}
 
 	public String getFalsoID() {
@@ -52,23 +56,23 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException {
-		//Caso especial quando só havia um nó na rede
+		//Caso especial quando sÃ³ havia um nÃ³ na rede
 		if(antStub == null & nextStub == null) {
 			antStub = newStub;
 			nextStub = newStub;
 			newStub.join_ok(nextStub, antStub);
 		}
-		//Quando o id do nó ingresante é maior que o seu -> envia para o seu sucessor tratar
+		//Quando o id do nÃ³ ingresante Ã© maior que o seu -> envia para o seu sucessor tratar
 		else if(getNode().getMyid().compareTo(newId) == -1){
 			nextStub.join(newStub, newId);
 		}
-		//Quando o id do nó ingresante é menor que o seu
+		//Quando o id do nÃ³ ingresante Ã© menor que o seu
 		else if(getNode().getMyid().compareTo(newId) == 1){
-			//E é maior que o ID do seu antecessor -> confirma a entrada na rede e atualiza os stubs
-			if(antStub.getNode().getMyid().compareTo(newId) == -1) {
+			//E Ã© maior que o ID do seu antecessor -> confirma a entrada na rede e atualiza os stubs
+			if(antID.compareTo(newId) == -1) {
 				
 			}
-			//Ou é menor que o antecessor -> envia a solicitacao para ele proprio tratar
+			//Ou Ã© menor que o antecessor -> envia a solicitacao para ele proprio tratar
 			else {
 				antStub.join(newStub, newId);
 			}
