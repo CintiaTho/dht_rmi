@@ -27,7 +27,7 @@ public interface Protocol extends Remote {
 
 	public void setNode(Node node) throws RemoteException;
 	
-	public boolean join(Protocol protocol, BigInteger bigInteger) throws RemoteException;
+	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException;
 	
 	public boolean join_ok() throws RemoteException;
 	

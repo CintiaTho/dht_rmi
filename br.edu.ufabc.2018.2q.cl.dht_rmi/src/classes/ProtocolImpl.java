@@ -51,8 +51,10 @@ public class ProtocolImpl implements Protocol {
 		this.node = node;
 	}
 
-	public boolean join(Protocol protocol, BigInteger bigInteger) throws RemoteException {
-		// TODO Auto-generated method stub
+	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException {
+		if(antStub == null | nextStub == null) {
+			
+		}
 		return true;
 	}
 
