@@ -101,7 +101,7 @@ public class Dht {
 									if(!teste) {
 										try{
 											//tentativa de entrar na rede comecando pelo no da lista (mais antigo para o mais novo)
-											teste = node.join(protocol.getStub(), protocol.getNode().getMyid());
+											teste = node.join(protocol.getMyStub(), protocol.getNode().getMyid());
 										}catch (ConnectException e) {
 											//caso inativo
 											remover.add(node);
@@ -119,7 +119,7 @@ public class Dht {
 							if(stubList.isEmpty()) {
 								System.out.println("Voce e o primeiro no na rede - Criada uma nova DHT!");
 							}
-							stubList.add(protocol.getStub());
+							stubList.add(protocol.getMyStub());
 							gravarStubTxt(stubList, nodesFile);
 							//-------		
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
@@ -237,8 +237,8 @@ public class Dht {
 		protocol = new ProtocolImpl(node);
 		try {
 			//criar o Stub
-			protocol.setStub((Protocol)UnicastRemoteObject.exportObject(protocol, 0));
-			String myStub = protocol.getStub().toString();
+			protocol.setMyStub((Protocol)UnicastRemoteObject.exportObject(protocol, 0));
+			String myStub = protocol.getMyStub().toString();
 			//criar o ID
 			BigInteger id = gerarID(myStub,algoritmoHash);
 			protocol.getNode().setMyid(id);

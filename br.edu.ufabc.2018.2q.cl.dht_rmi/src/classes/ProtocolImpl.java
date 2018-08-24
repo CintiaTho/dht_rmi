@@ -15,16 +15,16 @@ import java.rmi.RemoteException;
 public class ProtocolImpl implements Protocol {
 	private String falsoID;
 	private Node node;
-	private Protocol stub;
-	private Protocol next_stub;
-	private Protocol ant_stub;
+	private Protocol myStub;
+	private Protocol nextStub;
+	private Protocol antStub;
 	
 	public ProtocolImpl(Node node) {
 		this.node = node;
 		falsoID = "";
-		stub = null;
-		next_stub = null;
-		ant_stub = null;
+		myStub = null;
+		nextStub = null;
+		antStub = null;
 	}
 	
 	public String getFalsoID() {
@@ -35,12 +35,12 @@ public class ProtocolImpl implements Protocol {
 		this.falsoID = falsoID;
 	}
 
-	public Protocol getStub() {
-		return stub;
+	public Protocol getMyStub() {
+		return myStub;
 	}
 
-	public void setStub(Protocol stub) {
-		this.stub = stub;
+	public void setMyStub(Protocol stub) {
+		this.myStub = stub;
 	}
 
 	public Node getNode() {

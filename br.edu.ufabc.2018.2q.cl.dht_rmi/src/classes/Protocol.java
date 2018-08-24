@@ -19,9 +19,9 @@ public interface Protocol extends Remote {
 
 	public void setFalsoID(String string) throws RemoteException;
 
-	public Protocol getStub() throws RemoteException;
+	public Protocol getMyStub() throws RemoteException;
 
-	public void setStub(Protocol stub) throws RemoteException;
+	public void setMyStub(Protocol stub) throws RemoteException;
 	
 	public Node getNode() throws RemoteException;
 
