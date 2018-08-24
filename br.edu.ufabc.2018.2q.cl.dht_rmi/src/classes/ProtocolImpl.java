@@ -58,13 +58,20 @@ public class ProtocolImpl implements Protocol {
 			nextStub = newStub;
 			newStub.join_ok(nextStub, antStub);
 		}
-		//Quando o id do nó ingresante é maior que o seu
+		//Quando o id do nó ingresante é maior que o seu -> envia ara o seu sucessor tratar
 		else if(getNode().getMyid().compareTo(newId) == -1){
-
+			nextStub.join(newStub, newId);
 		}
 		//Quando o id do nó ingresante é menor que o seu
 		else if(getNode().getMyid().compareTo(newId) == 1){
-
+			//E é maior que o ID do seu antecessor -> confirma a entrada na rede e atualiza os stubs
+			if(antStub.getNode().getMyid().compareTo(newId) == -1) {
+				
+			}
+			//Ou é menor que o antecessor -> envia a solicitacao para ele proprio tratar
+			else {
+				antStub.join(newStub, newId);
+			}
 		}
 		return true;
 	}
@@ -88,8 +95,9 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	public boolean join_ok(Protocol nextStub, Protocol antStub) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		this.antStub = antStub;
+		this.nextStub = nextStub;
+		return true;
 	}
 
 	@Override
