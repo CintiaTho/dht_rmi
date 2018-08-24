@@ -69,7 +69,7 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	@Override
-	public boolean retrieve() throws RemoteException {
+	public boolean retrieve(BigInteger key) throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -108,6 +108,10 @@ public class ProtocolImpl implements Protocol {
 	public boolean transfer() throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public void delete(BigInteger key) throws RemoteException{
+		
 	}
 
 }

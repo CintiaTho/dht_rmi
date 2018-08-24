@@ -166,7 +166,11 @@ public class Dht {
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
-							//String value = protocol.retrieve(key, hash);
+							System.out.print("Informe a chave necessaria para recuperar o item: ");
+							text = entrada.nextLine();
+							String keyText = text;
+							BigInteger key = gerarID(keyText, algoritmoHash);
+							protocol.retrieve(key);
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -179,7 +183,11 @@ public class Dht {
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
-							//protocol.delete(key, hash);
+							System.out.print("Informe a chave necessaria para encontrar o item: ");
+							text = entrada.nextLine();
+							String keyText = text;
+							BigInteger key = gerarID(keyText, algoritmoHash);
+							protocol.delete(key);
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");

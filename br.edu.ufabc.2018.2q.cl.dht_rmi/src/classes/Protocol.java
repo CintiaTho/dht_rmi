@@ -39,11 +39,13 @@ public interface Protocol extends Remote {
 	
 	public boolean store(BigInteger key, String value) throws RemoteException;
 	
-	public boolean retrieve() throws RemoteException;
+	public boolean retrieve(BigInteger key) throws RemoteException;
 	
 	public boolean ok() throws RemoteException;
 	
 	public boolean not_found() throws RemoteException;
 	
 	public boolean transfer() throws RemoteException;
+
+	public void delete(BigInteger key) throws RemoteException;
 }
