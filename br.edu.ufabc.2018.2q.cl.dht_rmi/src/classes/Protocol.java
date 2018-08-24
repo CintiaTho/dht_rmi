@@ -29,7 +29,7 @@ public interface Protocol extends Remote {
 	
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException;
 	
-	public boolean join_ok() throws RemoteException;
+	public boolean join_ok(Protocol nextStub, Protocol antStub) throws RemoteException;
 	
 	public boolean new_node() throws RemoteException;
 	

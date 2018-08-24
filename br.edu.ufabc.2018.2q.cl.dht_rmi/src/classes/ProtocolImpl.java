@@ -18,7 +18,7 @@ public class ProtocolImpl implements Protocol {
 	private Protocol myStub;
 	private Protocol nextStub;
 	private Protocol antStub;
-	
+
 	public ProtocolImpl(Node node) {
 		this.node = node;
 		falsoID = "";
@@ -26,7 +26,7 @@ public class ProtocolImpl implements Protocol {
 		nextStub = null;
 		antStub = null;
 	}
-	
+
 	public String getFalsoID() {
 		return falsoID;
 	}
@@ -52,8 +52,19 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException {
-		if(antStub == null | nextStub == null) {
-			
+		//Caso especial quando só havia um nó na rede
+		if(antStub == null & nextStub == null) {
+			antStub = newStub;
+			nextStub = newStub;
+			newStub.join_ok(nextStub, antStub);
+		}
+		//Quando o id do nó ingresante é maior que o seu
+		else if(getNode().getMyid().compareTo(newId) == -1){
+
+		}
+		//Quando o id do nó ingresante é menor que o seu
+		else if(getNode().getMyid().compareTo(newId) == 1){
+
 		}
 		return true;
 	}
@@ -76,8 +87,7 @@ public class ProtocolImpl implements Protocol {
 		return false;
 	}
 
-	@Override
-	public boolean join_ok() throws RemoteException {
+	public boolean join_ok(Protocol nextStub, Protocol antStub) throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -111,9 +121,9 @@ public class ProtocolImpl implements Protocol {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
 	public void delete(BigInteger key) throws RemoteException{
-		
+
 	}
 
 }
