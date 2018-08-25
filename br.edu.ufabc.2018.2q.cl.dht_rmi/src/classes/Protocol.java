@@ -14,10 +14,10 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface Protocol extends Remote {
+	
+	public String getMyName() throws RemoteException;
 
-	public String getFalsoID() throws RemoteException;
-
-	public void setFalsoID(String string) throws RemoteException;
+	public void setMyName(String myName) throws RemoteException;
 
 	public Protocol getMyStub() throws RemoteException;
 

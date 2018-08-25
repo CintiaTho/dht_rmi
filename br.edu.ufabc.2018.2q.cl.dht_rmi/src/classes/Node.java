@@ -15,9 +15,17 @@ import java.util.HashMap;
 
 public interface Node extends java.io.Serializable {
 
-	public BigInteger getMyid() throws RemoteException;
+	public BigInteger getMyID() throws RemoteException;
 
-	public void setMyid(BigInteger id) throws RemoteException;
+	public void setMyID(BigInteger id) throws RemoteException;
+	
+	public BigInteger getPrevID() throws RemoteException;
+	
+	public void setPrevID(BigInteger prevID) throws RemoteException;
+	
+	public BigInteger getNextID() throws RemoteException;
+	
+	public void setNextID(BigInteger nextID) throws RemoteException;
 
 	public HashMap<BigInteger, String> getTexts() throws RemoteException;
 

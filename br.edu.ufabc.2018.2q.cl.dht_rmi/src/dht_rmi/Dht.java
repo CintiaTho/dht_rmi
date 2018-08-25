@@ -54,7 +54,7 @@ public class Dht {
 				System.out.println();
 				if(protocol == null) System.out.println("Nao faz parte de uma DHT.");
 				else {
-					System.out.println("No: " + protocol.getFalsoID());
+					System.out.println("No: " + protocol.getMyName());
 				}
 				System.out.print("Comando: ");
 				comando = entrada.nextLine();
@@ -100,7 +100,7 @@ public class Dht {
 							for(Protocol node: stubList) {
 								try{
 									//tentativa de entrar na rede comecando pelo no da lista (mais antigo para o mais novo)
-									teste = node.join(protocol.getMyStub(), protocol.getNode().getMyid());
+									teste = node.join(protocol.getMyStub(), protocol.getNode().getMyID());
 								}catch (ConnectException e) {
 									//caso inativo
 									remover.add(node);
@@ -116,7 +116,7 @@ public class Dht {
 
 							//insere o no na lista de stubs e atualiza o arquivo TXT
 							if(stubList.isEmpty()) {
-								protocol.join(protocol.getMyStub(), protocol.getNode().getMyid());
+								protocol.join(protocol.getMyStub(), protocol.getNode().getMyID());
 								System.out.println("Voce e o primeiro no na rede - Criada uma nova DHT!");
 							}
 
@@ -243,9 +243,9 @@ public class Dht {
 			String myStub = protocol.getMyStub().toString();
 			//criar o ID
 			BigInteger id = gerarID(myStub,algoritmoHash);
-			protocol.getNode().setMyid(id);
+			protocol.getNode().setMyID(id);
 			//criar o FalsoID (apenas demonstrativo)
-			protocol.setFalsoID(myStub.substring(77, 96));
+			protocol.setMyName(myStub.substring(77, 96));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

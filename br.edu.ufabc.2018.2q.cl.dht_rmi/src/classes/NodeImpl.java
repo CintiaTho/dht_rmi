@@ -16,22 +16,46 @@ import java.util.HashMap;
 public class NodeImpl implements Node {
 
 	private BigInteger myid;
+	private BigInteger nextID;
+	private BigInteger prevID;
 	private HashMap <BigInteger, String> texts;
 
 	public NodeImpl() {
 		super();
-		myid = null;
-		texts = null;
+		this.myid = null;
+		this.nextID = null;
+		this.prevID = null;
+		this.texts = new HashMap<BigInteger, String>();
 	}
-	public BigInteger getMyid() {
-		return myid;
+
+	public BigInteger getMyID() {
+		return this.myid;
 	}
-	public void setMyid(BigInteger myid) {
+
+	public void setMyID(BigInteger myid) {
 		this.myid = myid;
 	}
-	public HashMap<BigInteger, String> getTexts() {
-		return texts;
+
+	public BigInteger getPrevID() {
+		return this.prevID;
 	}
+
+	public void setPrevID(BigInteger prevID) {
+		this.prevID = prevID;
+	}
+
+	public BigInteger getNextID() {
+		return this.nextID;
+	}
+
+	public void setNextID(BigInteger nextID) {
+		this.nextID = nextID;
+	}
+
+	public HashMap<BigInteger, String> getTexts() {
+		return this.texts;
+	}
+
 	public void setTexts(HashMap<BigInteger, String> texts) {
 		this.texts = texts;
 	}
