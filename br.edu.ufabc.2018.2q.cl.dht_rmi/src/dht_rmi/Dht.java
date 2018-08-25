@@ -54,7 +54,7 @@ public class Dht {
 				System.out.println();
 				if(protocol == null) System.out.println("Nao faz parte de uma DHT.");
 				else {
-					System.out.println("No: " + protocol.getFalsoID());
+					System.out.println("No: " + protocol.getMyName());
 				}
 				System.out.print("Comando: ");
 				comando = entrada.nextLine();
@@ -244,7 +244,7 @@ public class Dht {
 			BigInteger id = gerarID(myStub,algoritmoHash);
 			protocol.getNode().setMyid(id);
 			//criar o FalsoID (apenas demonstrativo)
-			protocol.setFalsoID(myStub.substring(77, 96));
+			protocol.setMyName(myStub.substring(77, 96));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

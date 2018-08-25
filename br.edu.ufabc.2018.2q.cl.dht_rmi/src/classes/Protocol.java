@@ -15,9 +15,9 @@ import java.rmi.RemoteException;
 
 public interface Protocol extends Remote {
 	
-	public String getFalsoID() throws RemoteException;
+	public String getMyName() throws RemoteException;
 
-	public void setFalsoID(String string) throws RemoteException;
+	public void setMyName(String myName) throws RemoteException;
 
 	public Protocol getMyStub() throws RemoteException;
 
@@ -29,7 +29,7 @@ public interface Protocol extends Remote {
 	
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException;
 	
-	public boolean join_ok(Protocol nextStub, Protocol antStub) throws RemoteException;
+	public boolean join_ok(Protocol nextStub, Protocol prevStub) throws RemoteException;
 	
 	public boolean new_node(Protocol newStub) throws RemoteException;
 	

@@ -13,30 +13,26 @@ import java.math.BigInteger;
 import java.rmi.RemoteException;
 
 public class ProtocolImpl implements Protocol {
-	private String falsoID;
+	private String myName;
 	private Node node;
 	private Protocol myStub;
 	private Protocol nextStub;
-	private Protocol antStub;
-	private BigInteger nextID;
-	private BigInteger antID;
+	private Protocol prevStub;
 
 	public ProtocolImpl(Node node) {
 		this.node = node;
-		falsoID = "";
+		myName = "";
 		myStub = null;
 		nextStub = null;
-		nextID = 0;
-		antStub = null;
-		antID = 0;
+		prevStub = null;
 	}
 
-	public String getFalsoID() {
-		return falsoID;
+	public String getMyName() {
+		return myName;
 	}
 
-	public void setFalsoID(String falsoID) {
-		this.falsoID = falsoID;
+	public void setMyName(String myName) {
+		this.myName = myName;
 	}
 
 	public Protocol getMyStub() {
@@ -57,31 +53,33 @@ public class ProtocolImpl implements Protocol {
 
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException {
 		//Caso especial quando só havia um nó na rede
-		if(antStub == null & nextStub == null) {
-			antStub = newStub;
+		if(prevStub == null & nextStub == null) {
+			prevStub = newStub;
 			nextStub = newStub;
-			newStub.join_ok(nextStub, antStub);
+			getNode().setPrevID(newId);
+			getNode().setNextID(newId);
+			newStub.join_ok(nextStub, prevStub);
 		}
-		//Quando o id do nó ingresante é maior que o seu -> envia para o seu sucessor tratar
+		//Quando o id do node ingresante eh maior que o seu -> envia para o seu sucessor tratar
 		else if(getNode().getMyid().compareTo(newId) == -1){
 			nextStub.join(newStub, newId);
 		}
-		//Quando o id do nó ingresante é menor que o seu
+		//Quando o id do node ingresante eh menor que o seu
 		else if(getNode().getMyid().compareTo(newId) == 1){
 			//E é maior que o ID do seu antecessor -> confirma a entrada na rede e atualiza os stubs
-			if(antID.compareTo(newId) == -1) {
+			if(getNode().getPrevID().compareTo(newId) == -1) {
 				
 			}
-			//Ou é menor que o antecessor -> envia a solicitacao para ele proprio tratar
+			//Ou eh menor que o antecessor -> envia a solicitacao para ele proprio tratar
 			else {
-				antStub.join(newStub, newId);
+				prevStub.join(newStub, newId);
 			}
 		}
 		return true;
 	}
 	
 	public boolean join_ok(Protocol nextStub, Protocol antStub) throws RemoteException {
-		this.antStub = antStub;
+		this.prevStub = antStub;
 		this.nextStub = nextStub;
 		return true;
 	}
