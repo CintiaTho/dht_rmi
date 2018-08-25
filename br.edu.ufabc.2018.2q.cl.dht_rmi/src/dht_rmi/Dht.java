@@ -22,10 +22,12 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import classes.Node;
 import classes.NodeImpl;
+import classes.Part;
 import classes.Protocol;
 import classes.ProtocolImpl;
 
@@ -74,7 +76,8 @@ public class Dht {
 						System.out.println("store - Guardar um item na DHT;");
 						System.out.println("retrieve - buscar um item na DHT;");
 						System.out.println("delete - apagar um item na DHT;");
-						System.out.println("viewDHT - visualizar a DHT;");
+						System.out.println("viewItens - visualizar os Itens sob sua responsabilidade;");
+						System.out.println("viewDHT - visualizar a topologia da DHT (nodes e conexoes);");
 						System.out.println("quit - Terminar esta sessao.");
 					}
 					break;
@@ -165,18 +168,13 @@ public class Dht {
 					//-------------------------------------------------
 				case "retrieve":
 					if(protocol!=null) {
-						System.out.print("Quer realmente realizar esta acao? (s/n) ");
+						//-------
+						System.out.print("Informe a chave necessaria para recuperar o item: ");
 						text = entrada.nextLine();
-						if(text.equals("s")){
-							//-------
-							System.out.print("Informe a chave necessaria para recuperar o item: ");
-							text = entrada.nextLine();
-							String keyText = text;
-							BigInteger key = gerarID(keyText, algoritmoHash);
-							protocol.retrieve(key);
-							//-------
-						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
-						else System.out.println("Comando invalido, operacao cancelada!");
+						String keyText = text;
+						BigInteger key = gerarID(keyText, algoritmoHash);
+						protocol.retrieve(key);
+						//-------
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
 					break;
 					//-------------------------------------------------
@@ -194,6 +192,18 @@ public class Dht {
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
+					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
+					break;
+					//-------------------------------------------------
+				case "viewItens":
+					if(protocol!=null) {
+						//-------
+						int count = 1;
+						for (HashMap.Entry<BigInteger, String> it : protocol.getNode().getTexts().entrySet()){  
+							System.out.println("Key "+count+": "+it.getKey()+" / Valor: " + it.getValue());
+						}
+						System.out.println();
+						//-------
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
 					break;
 					//-------------------------------------------------
@@ -247,7 +257,7 @@ public class Dht {
 			//criar o ID
 			BigInteger id = gerarID(myStub,algoritmoHash);
 			protocol.getNode().setMyId(id);
-			//criar o FalsoID (apenas demonstrativo)
+			//criar o Nome do Node (apenas demonstrativo)
 			protocol.setMyName(myStub.substring(77, 96));
 		} catch (RemoteException e) {
 			e.printStackTrace();
