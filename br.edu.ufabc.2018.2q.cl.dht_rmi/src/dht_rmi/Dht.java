@@ -222,11 +222,11 @@ public class Dht {
 								//System.out.print(".");
 							}
 							//System.out.println();
-							for (HashMap.Entry<BigInteger, String> it : protocol.getNode().getTexts().entrySet()){  
+							for (HashMap.Entry<BigInteger, String> it : protocol.getView().entrySet()){  
 								System.out.println("NodeNome : "+it.getValue()+" / Id: "+it.getKey()+" -->");
 							}
 							System.out.println("Fim/Volta para o Início");
-							System.out.println();
+							protocol.setView(new HashMap<>());
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");

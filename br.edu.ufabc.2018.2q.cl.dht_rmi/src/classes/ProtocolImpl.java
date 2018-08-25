@@ -27,7 +27,7 @@ public class ProtocolImpl implements Protocol {
 		this.myStub = null;
 		this.predecessor = null;
 		this.sucessor = null;
-		this.view = new HashMap<BigInteger, String>();
+		this.view = new HashMap<>();
 	}
 
 	public String getMyName() {
@@ -214,10 +214,15 @@ public class ProtocolImpl implements Protocol {
 	}
 	
 	public boolean view(HashMap<BigInteger, String> view) throws RemoteException {
-		if(view.containsKey(this.getNode().getMyId())) {
+		if(this.predecessor.equals(this.myStub) & this.sucessor.equals(this.myStub)) {
+			System.out.println("Somente ha voce na DHT.");
+			view.put(this.getNode().getMyId(), this.getMyName());
+			this.setView(view);
+		}
+		else if(view.containsKey(this.getNode().getMyId())) {
 			System.out.println("View Finalizada!");
 			view.put(this.getNode().getMyId(), this.getMyName());
-			this.view = view;
+			this.setView(view);
 		}
 		else {
 		System.out.println("Adicionando Node na View...");
