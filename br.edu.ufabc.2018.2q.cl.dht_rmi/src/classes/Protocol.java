@@ -27,14 +27,14 @@ public interface Protocol extends Remote {
 
 	public void setNode(Node node) throws RemoteException;
 
-	public void begin_to_leave() throws RemoteException;
-
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException, RuntimeException;
 
 	public boolean join_ok(Protocol predecessor, Protocol sucessor) throws RemoteException;
 
 	public boolean new_node(Protocol newStub) throws RemoteException;
 
+	public void begin_to_leave() throws RemoteException;
+	
 	public boolean leave(Protocol newStub) throws RemoteException;
 
 	public boolean node_gone(Protocol newStub) throws RemoteException;

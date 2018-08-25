@@ -52,18 +52,6 @@ public class ProtocolImpl implements Protocol {
 		this.node = node;
 	}
 
-	public void begin_to_leave() throws RemoteException {
-		this.sucessor.leave(this.predecessor);
-		this.predecessor.node_gone(this.sucessor);
-
-		HashMap<BigInteger, String> entradasAntigas = this.getNode().getTexts();
-		for (HashMap.Entry<BigInteger, String> entry: entradasAntigas.entrySet()) {
-			BigInteger chave = entry.getKey();
-			String valor = entry.getValue();
-			this.sucessor.transfer(chave, valor);
-		}
-	}
-
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException {
 		// Trata corner cases primeiro
 
@@ -149,6 +137,18 @@ public class ProtocolImpl implements Protocol {
 		this.sucessor = newStub;
 		this.getNode().setNextId(newStub.getNode().getMyId());
 		return true;
+	}
+	
+	public void begin_to_leave() throws RemoteException {
+		this.sucessor.leave(this.predecessor);
+		this.predecessor.node_gone(this.sucessor);
+
+		HashMap<BigInteger, String> entradasAntigas = this.getNode().getTexts();
+		for (HashMap.Entry<BigInteger, String> entry: entradasAntigas.entrySet()) {
+			BigInteger chave = entry.getKey();
+			String valor = entry.getValue();
+			this.sucessor.transfer(chave, valor);
+		}
 	}
 
 	@Override
