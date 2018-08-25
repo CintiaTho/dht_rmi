@@ -89,21 +89,22 @@ public class Dht {
 							//-------
 							//Cria o no (cria o ID e Stub)
 							protocol = criarNodeDHT(protocol, algoritmoHash);
-
-							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
-							//Faz isso ate achar um stub disponivel ou ate ser necessario criar uma nova rede;
+							
+							//Busca os registros Stub presentes no arquivo
 							stubList = leituraStubTxt(nodesFile);
 							
+							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
+							//Faz isso ate achar um stub disponivel ou ate ser necessario criar uma nova rede;
 							if(!stubList.isEmpty()) {
 								Boolean teste = false;
 								ArrayList<Protocol> remover = new ArrayList<>();
 	
 								for(Protocol node: stubList) {
 									try{
-										//tentativa de entrar na rede comecando pelo no da lista (mais antigo para o mais novo)
+										//tentativa de entrar na rede comecando pelo node da lista mais antigo para o mais novo
 										teste = node.join(protocol.getMyStub(), protocol.getNode().getMyId());
 									}catch (ConnectException e) {
-										//caso inativo
+										//caso inativo - node indisponivel
 										remover.add(node);
 									}
 									if(teste) break;
@@ -115,12 +116,12 @@ public class Dht {
 									System.err.println("No removido: " + node.toString());
 								}
 							}
-							
-							//insere o no na lista de stubs e atualiza o arquivo TXT
+							//Caso a lista esteja ou fique vazia (nao conseguiu se conectar com otros nodes) iniciar uma nova DHT
 							if(stubList.isEmpty()) {
 								protocol.join(protocol.getMyStub(), protocol.getNode().getMyId());
 							}
-
+							
+							//insere o node novo na lista de stubs e atualiza o arquivo TXT
 							stubList.add(protocol.getMyStub());
 							gravarStubTxt(stubList, nodesFile);
 							//-------

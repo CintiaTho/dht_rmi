@@ -71,9 +71,9 @@ public class ProtocolImpl implements Protocol {
 
 		} else if (this.getNode().getMyId().compareTo(this.getNode().getPrevId()) <= 0 && this.getNode().getPrevId().compareTo(newId) < 0) {
 
-			// corner case: no atual eh o menor do DHT, predecessor eh o maior do DHT
+			// corner case: node atual eh o menor do DHT, predecessor eh o maior do DHT
 			// corner case: newStub eh maior que o maior do DHT
-			// como o no atual eh o menor do DHT e eh quem envia o transfer, deve conter as entradas maior que o maior do DHT
+			// como o node atual eh o menor do DHT e eh quem envia o transfer, deve conter as entradas maiores que o maior do DHT
 			for (HashMap.Entry<BigInteger, String> entry: entradasAntigas.entrySet()) {
 				BigInteger chave = entry.getKey();
 				String valor = entry.getValue();
