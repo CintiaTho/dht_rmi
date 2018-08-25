@@ -35,7 +35,7 @@ public class Dht {
 		//Criacao de variaveis de trabalho dos metodos dessa classe
 		Protocol protocol = null;
 
-		ArrayList<Protocol> stubList = new ArrayList<>();
+		ArrayList<Protocol> stubList = new ArrayList<Protocol>();
 		File nodesFile = new File("./src/dht_rmi/nodes_list.txt");
 
 		String algoritmoHash = "MD5";
@@ -93,27 +93,29 @@ public class Dht {
 							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
 							//Faz isso ate achar um stub disponivel ou ate ser necessario criar uma nova rede;
 							stubList = leituraStubTxt(nodesFile);
-
-							Boolean teste = false;
-							ArrayList<Protocol> remover = new ArrayList<>();
-
-							for(Protocol node: stubList) {
-								try{
-									//tentativa de entrar na rede comecando pelo no da lista (mais antigo para o mais novo)
-									teste = node.join(protocol.getMyStub(), protocol.getNode().getMyId());
-								}catch (ConnectException e) {
-									//caso inativo
-									remover.add(node);
+							
+							if(!stubList.isEmpty()) {
+								Boolean teste = false;
+								ArrayList<Protocol> remover = new ArrayList<>();
+	
+								for(Protocol node: stubList) {
+									try{
+										//tentativa de entrar na rede comecando pelo no da lista (mais antigo para o mais novo)
+										teste = node.join(protocol.getMyStub(), protocol.getNode().getMyId());
+									}catch (ConnectException e) {
+										//caso inativo
+										remover.add(node);
+									}
+									if(teste) break;
 								}
-								if(teste) break;
+	
+								//remove os stubs conhecidamente inativos
+								for(Protocol node: remover) {
+									stubList.remove(node);
+									System.err.println("No removido: " + node.toString());
+								}
 							}
-
-							//remove os stubs conhecidamente inativos
-							for(Protocol node: remover) {
-								stubList.remove(node);
-								System.err.println("No removido: " + node.toString());
-							}
-
+							
 							//insere o no na lista de stubs e atualiza o arquivo TXT
 							if(stubList.isEmpty()) {
 								protocol.join(protocol.getMyStub(), protocol.getNode().getMyId());
@@ -227,6 +229,7 @@ public class Dht {
 				}
 			}
 		} catch (Exception e) {
+			//e.printStackTrace();
 			System.err.println("Ocorreu um erro no servidor: " + e.toString());
 		} finally {
 			if(entrada != null) entrada.close();
@@ -266,18 +269,20 @@ public class Dht {
 	}
 
 	//Metodo que le e copia todos os itens armazenados no TXT
+	@SuppressWarnings("unchecked")
 	public static ArrayList<Protocol> leituraStubTxt(File nodesFile) throws IOException {
 		ObjectInputStream in = null;
-		ArrayList<Protocol> objetos = new ArrayList<>();
+		ArrayList<Protocol> objetos = new ArrayList<Protocol>();
 		try {
 			in = new ObjectInputStream(new FileInputStream(nodesFile));
 			objetos = (ArrayList<Protocol>) in.readObject();
+			in.close();
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			//ex.printStackTrace();
+			System.err.println("Arquivo de Stubs vazio: " + ex.toString());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		in.close();
 		return objetos;
 	}
 

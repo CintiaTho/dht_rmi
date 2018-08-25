@@ -192,7 +192,12 @@ public class ProtocolImpl implements Protocol {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	@Override
+	public void delete(BigInteger key) throws RemoteException{
 
+	}
+	
 	@Override
 	public boolean ok() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -203,10 +208,6 @@ public class ProtocolImpl implements Protocol {
 	public boolean not_found() throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	public void delete(BigInteger key) throws RemoteException{
-
 	}
 
 }
