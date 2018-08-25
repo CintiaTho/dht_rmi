@@ -29,9 +29,9 @@ public interface Protocol extends Remote {
 
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException, RuntimeException;
 
-	public boolean join_ok(Protocol predecessor, Protocol sucessor) throws RemoteException;
+	public boolean join_ok(Protocol predecessor, Protocol sucessor, BigInteger prevId, BigInteger nextId) throws RemoteException;
 
-	public boolean new_node(Protocol newStub) throws RemoteException;
+	public boolean new_node(Protocol newStub, BigInteger newId) throws RemoteException;
 
 	public void begin_to_leave() throws RemoteException;
 	

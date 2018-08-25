@@ -119,7 +119,6 @@ public class Dht {
 							//insere o no na lista de stubs e atualiza o arquivo TXT
 							if(stubList.isEmpty()) {
 								protocol.join(protocol.getMyStub(), protocol.getNode().getMyId());
-								System.out.println("Voce e o primeiro no na rede - Criada uma nova DHT!");
 							}
 
 							stubList.add(protocol.getMyStub());
