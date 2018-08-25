@@ -12,6 +12,7 @@ package classes;
 import java.math.BigInteger;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
 public interface Protocol extends Remote {
 	
@@ -26,6 +27,10 @@ public interface Protocol extends Remote {
 	public Node getNode() throws RemoteException;
 
 	public void setNode(Node node) throws RemoteException;
+	
+	public HashMap<BigInteger, String> getView() throws RemoteException;
+
+	public void setView(HashMap<BigInteger, String> view) throws RemoteException;
 
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException, RuntimeException;
 
@@ -44,10 +49,13 @@ public interface Protocol extends Remote {
 	public boolean store(BigInteger key, String value) throws RemoteException;
 
 	public boolean retrieve(BigInteger key) throws RemoteException;
+	
+	public void delete(BigInteger key) throws RemoteException;
 
 	public boolean ok() throws RemoteException;
 
 	public boolean not_found() throws RemoteException;
+	
+	public boolean view(HashMap<BigInteger, String> view) throws RemoteException;
 
-	public void delete(BigInteger key) throws RemoteException;
 }

@@ -27,7 +27,6 @@ import java.util.Scanner;
 
 import classes.Node;
 import classes.NodeImpl;
-import classes.Part;
 import classes.Protocol;
 import classes.ProtocolImpl;
 
@@ -72,7 +71,7 @@ public class Dht {
 					}
 					else {
 						System.out.println("Gostaria de: ");
-						System.out.println("leave - Sair da DHT;");
+						System.out.println("leave - Sair da DHT (voce mantem seu ID);");
 						System.out.println("store - Guardar um item na DHT;");
 						System.out.println("retrieve - buscar um item na DHT;");
 						System.out.println("delete - apagar um item na DHT;");
@@ -116,7 +115,7 @@ public class Dht {
 								//remove os stubs conhecidamente inativos
 								for(Protocol node: remover) {
 									stubList.remove(node);
-									System.err.println("No removido: " + node.toString());
+									System.err.println("Node indisponível removido: " + node.toString());
 								}
 							}
 							//Caso a lista esteja ou fique vazia (nao conseguiu se conectar com otros nodes) iniciar uma nova DHT
@@ -198,11 +197,14 @@ public class Dht {
 				case "viewItens":
 					if(protocol!=null) {
 						//-------
-						int count = 1;
-						for (HashMap.Entry<BigInteger, String> it : protocol.getNode().getTexts().entrySet()){  
-							System.out.println("Key "+count+": "+it.getKey()+" / Valor: " + it.getValue());
+						if(protocol.getNode().getTexts().isEmpty()) System.out.println("Não há Itens no seu Node.");
+						else {
+							int count = 1;
+							for (HashMap.Entry<BigInteger, String> it : protocol.getNode().getTexts().entrySet()){  
+								System.out.println("Key "+count+": "+it.getKey()+" / Valor: "+it.getValue());
+							}
+							System.out.println();
 						}
-						System.out.println();
 						//-------
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
 					break;
@@ -213,7 +215,18 @@ public class Dht {
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
-							//ArrayList view = protocol.view();
+							HashMap<BigInteger, String> view = new HashMap<>(); 
+							protocol.view(view);
+							//System.out.print("Estamos obtendo os dados...");
+							while(protocol.getView().isEmpty()) {
+								//System.out.print(".");
+							}
+							//System.out.println();
+							for (HashMap.Entry<BigInteger, String> it : protocol.getNode().getTexts().entrySet()){  
+								System.out.println("NodeNome : "+it.getValue()+" / Id: "+it.getKey()+" -->");
+							}
+							System.out.println("Fim/Volta para o Início");
+							System.out.println();
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -239,7 +252,7 @@ public class Dht {
 				}
 			}
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			System.err.println("Ocorreu um erro no servidor: " + e.toString());
 		} finally {
 			if(entrada != null) entrada.close();
@@ -248,31 +261,37 @@ public class Dht {
 
 	//Metodo usado para criar o no atrelado a aplicacao instanciada (rodando localmente)
 	public static Protocol criarNodeDHT(Protocol protocol, String algoritmoHash) {
+		System.out.print("Criando o seu Node...");
 		Node node = new NodeImpl();
 		protocol = new ProtocolImpl(node);
 		try {
 			//criar o Stub
+			System.out.print("Criando o Stub...");
 			protocol.setMyStub((Protocol)UnicastRemoteObject.exportObject(protocol, 0));
 			String myStub = protocol.getMyStub().toString();
 			//criar o ID
 			BigInteger id = gerarID(myStub,algoritmoHash);
 			protocol.getNode().setMyId(id);
 			//criar o Nome do Node (apenas demonstrativo)
+			System.out.print("Criando o Nome...");
 			protocol.setMyName(myStub.substring(77, 96));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+		System.out.println("Node criado!");
 		return protocol;
 	}
 
 	//Metodo que efetua a atualizacao do arquivo TXT
 	public static void gravarStubTxt(ArrayList<Protocol> stubList, File nodesFile) {
+		System.out.print("Gravando/Atualizando o arquivo de Stubs...");
 		ObjectOutputStream out = null;
 		try {
 			out = new ObjectOutputStream(new FileOutputStream(nodesFile));
 			out.writeObject(stubList);
 			out.flush();
 			out.close();
+			System.out.println("Gravação/Atualização terminada!");
 		} catch (IOException ex) {
 			System.out.println("Nao foi possivel gravar");
 		}
@@ -281,6 +300,7 @@ public class Dht {
 	//Metodo que le e copia todos os itens armazenados no TXT
 	@SuppressWarnings("unchecked")
 	public static ArrayList<Protocol> leituraStubTxt(File nodesFile) throws IOException {
+		System.out.print("Lendo arquivo de Stubs...");
 		ObjectInputStream in = null;
 		ArrayList<Protocol> objetos = new ArrayList<Protocol>();
 		try {
@@ -293,11 +313,13 @@ public class Dht {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		System.out.println("Leitura finalizada!");
 		return objetos;
 	}
 
 	//Metodo para gerar os IDs seguramente criptografados - tanto para os nos quanto para os itens
 	public static BigInteger gerarID(String frase, String algoritmoHash) {
+		System.out.print("Gerando o ID...");
 		try {
 			MessageDigest md = MessageDigest.getInstance(algoritmoHash);
 			md.update(frase.getBytes());

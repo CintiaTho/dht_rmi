@@ -19,6 +19,7 @@ public class ProtocolImpl implements Protocol {
 	private Protocol myStub;
 	private Protocol sucessor;
 	private Protocol predecessor;
+	private HashMap<BigInteger, String> view;
 
 	public ProtocolImpl(Node node) {
 		this.node = node;
@@ -26,6 +27,7 @@ public class ProtocolImpl implements Protocol {
 		this.myStub = null;
 		this.predecessor = null;
 		this.sucessor = null;
+		this.view = new HashMap<BigInteger, String>();
 	}
 
 	public String getMyName() {
@@ -51,6 +53,14 @@ public class ProtocolImpl implements Protocol {
 	public void setNode(Node node) {
 		this.node = node;
 	}
+	
+	public HashMap<BigInteger, String> getView() {
+		return view;
+	}
+
+	public void setView(HashMap<BigInteger, String> view) {
+		this.view = view;
+	}
 
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException {
 		// Trata corner cases primeiro
@@ -62,7 +72,7 @@ public class ProtocolImpl implements Protocol {
 		if (this.myStub == newStub && this.getNode().getMyId().compareTo(newId) == 0) {
 
 			// corner case: primeiro no do DHT
-			System.out.println("Voce e o primeiro no na rede - Criada uma nova DHT!");
+			System.out.println("Voce e o primeiro node na rede - Criada uma nova DHT!");
 			this.predecessor = this.myStub;
 			this.sucessor = this.myStub;
 			this.getNode().setPrevId(this.getNode().getMyId());
@@ -202,5 +212,17 @@ public class ProtocolImpl implements Protocol {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
+	public boolean view(HashMap<BigInteger, String> view) throws RemoteException {
+		if(view.containsKey(this.getNode().getMyId())) {
+			System.out.println("View Finalizada!");
+			view.put(this.getNode().getMyId(), this.getMyName());
+			this.view = view;
+		}
+		else {
+		System.out.println("Adicionando Node na View...");
+		view.put(this.getNode().getMyId(), this.getMyName());
+		}
+		return true;
+	}
 }
