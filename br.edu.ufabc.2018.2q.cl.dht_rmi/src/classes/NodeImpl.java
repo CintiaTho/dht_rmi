@@ -16,8 +16,8 @@ import java.util.HashMap;
 public class NodeImpl implements Node {
 
 	private BigInteger myid;
-	private HashMap <byte[], String> texts;
-	
+	private HashMap <BigInteger, String> texts;
+
 	public NodeImpl() {
 		super();
 		myid = null;
@@ -29,11 +29,14 @@ public class NodeImpl implements Node {
 	public void setMyid(BigInteger myid) {
 		this.myid = myid;
 	}
-	public HashMap<byte[], String> getTexts() {
+	public HashMap<BigInteger, String> getTexts() {
 		return texts;
 	}
-	public void setTexts(HashMap<byte[], String> texts) {
+	public void setTexts(HashMap<BigInteger, String> texts) {
 		this.texts = texts;
 	}
-	
+
+	public void insertText(BigInteger chave, String texto) {
+		this.texts.put(chave, texto);
+	}
 }

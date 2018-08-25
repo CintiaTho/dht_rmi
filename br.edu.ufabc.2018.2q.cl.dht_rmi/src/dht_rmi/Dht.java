@@ -34,12 +34,12 @@ public class Dht {
 	public static void main(String[] args) {
 		//Criacao de variaveis de trabalho dos metodos dessa classe
 		Protocol protocol = null;
-		
+
 		ArrayList<Protocol> stubList = new ArrayList<>();
 		File nodesFile = new File("./src/dht_rmi/nodes_list.txt");
-		
+
 		String algoritmoHash = "MD5";
-		
+
 		Scanner entrada = new Scanner(System.in);
 		String comando = "";
 		String text;
@@ -47,7 +47,7 @@ public class Dht {
 		//texto inicial explicativo sobre o funcionamento da interface
 		System.out.println("Digite: 'commands' para visualisar a lista de possiveis comandos permitidos ao usuario.");
 		System.out.println("Caso ja os conheca, digite a primeira acao que deseja realizar e aperte enter...");
-		try {	
+		try {
 			//loop principal para receber os comandos do usuario e mostrar informacoes
 			while (comando != "quit") {
 				//informacoes que sempre aparecerao ao usuario
@@ -89,39 +89,40 @@ public class Dht {
 							//-------
 							//Cria o no (cria o ID e Stub)
 							protocol = criarNodeDHT(protocol, algoritmoHash);
-							
+
 							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
 							//Faz isso ate achar um stub disponivel ou ate ser necessario criar uma nova rede;
 							stubList = leituraStubTxt(nodesFile);
-							if(!stubList.isEmpty()) {
-								//lista de apoio para retirada de itens inativos da lista de stubs
-								ArrayList<Protocol> remover = new ArrayList<>();
-								Boolean teste = false;
-								for(Protocol node: stubList) {
-									if(!teste) {
-										try{
-											//tentativa de entrar na rede comecando pelo no da lista (mais antigo para o mais novo)
-											teste = node.join(protocol.getMyStub(), protocol.getNode().getMyid());
-										}catch (ConnectException e) {
-											//caso inativo
-											remover.add(node);
-										}
-									}
+
+							Boolean teste = false;
+							ArrayList<Protocol> remover = new ArrayList<>();
+
+							for(Protocol node: stubList) {
+								try{
+									//tentativa de entrar na rede comecando pelo no da lista (mais antigo para o mais novo)
+									teste = node.join(protocol.getMyStub(), protocol.getNode().getMyid());
+								}catch (ConnectException e) {
+									//caso inativo
+									remover.add(node);
 								}
-								//remove os stubs conhecidamente inativos
-								for(Protocol node: remover) {
-									stubList.remove(node);
-									System.err.println("No removido: " + node.toString());
-								}
+								if(teste) break;
 							}
-							
+
+							//remove os stubs conhecidamente inativos
+							for(Protocol node: remover) {
+								stubList.remove(node);
+								System.err.println("No removido: " + node.toString());
+							}
+
 							//insere o no na lista de stubs e atualiza o arquivo TXT
 							if(stubList.isEmpty()) {
+								protocol.join(protocol.getMyStub(), protocol.getNode().getMyid());
 								System.out.println("Voce e o primeiro no na rede - Criada uma nova DHT!");
 							}
+
 							stubList.add(protocol.getMyStub());
 							gravarStubTxt(stubList, nodesFile);
-							//-------		
+							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
 					} else System.out.println("Comando invalido, voce ja pertence a uma DHT!");
@@ -132,9 +133,9 @@ public class Dht {
 						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
-							//-------	
-							protocol.leave();
-							//-------	
+							//-------
+							protocol.begin_to_leave();
+							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
@@ -146,11 +147,11 @@ public class Dht {
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
-							System.out.print("Informe a chave que será utilizada para recuperar o item posteriormente: ");
+							System.out.print("Informe a chave que sera utilizada para recuperar o item posteriormente: ");
 							text = entrada.nextLine();
 							String keyText = text;
 							BigInteger key = gerarID(keyText, algoritmoHash);
-							System.out.print("Informe o valor que será atribuído a chave previamente informada: ");
+							System.out.print("Informe o valor que sera atribuido a chave previamente informada: ");
 							text = entrada.nextLine();
 							String value = text;
 							protocol.store(key, value);
@@ -158,7 +159,7 @@ public class Dht {
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
-					break;	
+					break;
 					//-------------------------------------------------
 				case "retrieve":
 					if(protocol!=null) {
@@ -175,7 +176,7 @@ public class Dht {
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
-					break;	
+					break;
 					//-------------------------------------------------
 				case "delete":
 					if(protocol!=null) {
@@ -192,7 +193,7 @@ public class Dht {
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
-					break;	
+					break;
 					//-------------------------------------------------
 				case "viewDHT":
 					if(protocol!=null) {
@@ -205,7 +206,7 @@ public class Dht {
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
-					break;	
+					break;
 					//-------------------------------------------------
 				case "quit":
 					System.out.println("Seus dados serao perdidos e sua posicao atual na DHT!");
@@ -213,26 +214,26 @@ public class Dht {
 					text = entrada.nextLine();
 					if(text.equals("s")){
 						//-------
-						if(protocol != null) protocol.leave();
+						if(protocol != null) protocol.begin_to_leave();
 						System.out.println("Sessao Finalizada!");
 						System.exit(0);
 						//-------
 					} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 					else System.out.println("Comando invalido, operacao cancelada!");
-					break;	
+					break;
 					//-------------------------------------------------
 				default:
 					System.out.println("Este nao e um comando valido!");
 				}
-			}	
+			}
 		} catch (Exception e) {
 			System.err.println("Ocorreu um erro no servidor: " + e.toString());
 		} finally {
 			if(entrada != null) entrada.close();
 		}
 	}
-	
-	//Metodo usado para criar o nó atrelado a aplicacao instanciada (rodando localmente) 
+
+	//Metodo usado para criar o no atrelado a aplicacao instanciada (rodando localmente)
 	public static Protocol criarNodeDHT(Protocol protocol, String algoritmoHash) {
 		Node node = new NodeImpl();
 		protocol = new ProtocolImpl(node);
@@ -250,7 +251,7 @@ public class Dht {
 		}
 		return protocol;
 	}
-	
+
 	//Metodo que efetua a atualizacao do arquivo TXT
 	public static void gravarStubTxt(ArrayList<Protocol> stubList, File nodesFile) {
 		ObjectOutputStream out = null;
@@ -263,7 +264,7 @@ public class Dht {
 			System.out.println("Nao foi possivel gravar");
 		}
 	}
-	
+
 	//Metodo que le e copia todos os itens armazenados no TXT
 	public static ArrayList<Protocol> leituraStubTxt(File nodesFile) throws IOException {
 		ObjectInputStream in = null;
@@ -279,8 +280,8 @@ public class Dht {
 		in.close();
 		return objetos;
 	}
-	
-	//Metodo para gerar os IDs seguramente criptografados - tanto para os nós quanto para os itens
+
+	//Metodo para gerar os IDs seguramente criptografados - tanto para os nos quanto para os itens
 	public static BigInteger gerarID(String frase, String algoritmoHash) {
 		try {
 			MessageDigest md = MessageDigest.getInstance(algoritmoHash);

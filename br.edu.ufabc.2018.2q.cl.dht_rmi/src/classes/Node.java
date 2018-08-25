@@ -14,12 +14,14 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 public interface Node extends java.io.Serializable {
-	
+
 	public BigInteger getMyid() throws RemoteException;
-	
+
 	public void setMyid(BigInteger id) throws RemoteException;
-	
-	public HashMap<byte[], String> getTexts() throws RemoteException;
-	
-	public void setTexts(HashMap<byte[], String> texts) throws RemoteException;
+
+	public HashMap<BigInteger, String> getTexts() throws RemoteException;
+
+	public void setTexts(HashMap<BigInteger, String> texts) throws RemoteException;
+
+	public void insertText(BigInteger chave, String texto) throws RemoteException;
 }
