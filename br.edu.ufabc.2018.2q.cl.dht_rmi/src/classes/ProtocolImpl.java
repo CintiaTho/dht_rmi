@@ -40,14 +40,6 @@ public class ProtocolImpl implements Protocol {
 		return this.myStub;
 	}
 
-	public Protocol getPredecessor() {
-		return this.predecessor;
-	}
-
-	public Protocol getSucessor() {
-		return this.sucessor;
-	}
-
 	public void setMyStub(Protocol stub) {
 		this.myStub = stub;
 	}

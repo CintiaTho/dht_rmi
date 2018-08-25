@@ -21,10 +21,6 @@ public interface Protocol extends Remote {
 
 	public Protocol getMyStub() throws RemoteException;
 
-	public Protocol getPredecessor() throws RemoteException;
-
-	public Protocol getSucessor() throws RemoteException;
-
 	public void setMyStub(Protocol stub) throws RemoteException;
 
 	public Node getNode() throws RemoteException;
