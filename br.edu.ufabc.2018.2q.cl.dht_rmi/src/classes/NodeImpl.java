@@ -15,41 +15,41 @@ import java.util.HashMap;
 @SuppressWarnings("serial")
 public class NodeImpl implements Node {
 
-	private BigInteger myid;
-	private BigInteger nextID;
-	private BigInteger prevID;
+	private BigInteger myId;
+	private BigInteger nextId;
+	private BigInteger prevId;
 	private HashMap <BigInteger, String> texts;
 
 	public NodeImpl() {
 		super();
-		this.myid = null;
-		this.nextID = null;
-		this.prevID = null;
+		this.myId = null;
+		this.nextId = null;
+		this.prevId = null;
 		this.texts = new HashMap<BigInteger, String>();
 	}
 
-	public BigInteger getMyID() {
-		return this.myid;
+	public BigInteger getMyId() {
+		return this.myId;
 	}
 
-	public void setMyID(BigInteger myid) {
-		this.myid = myid;
+	public void setMyId(BigInteger myid) {
+		this.myId = myid;
 	}
 
-	public BigInteger getPrevID() {
-		return this.prevID;
+	public BigInteger getPrevId() {
+		return this.prevId;
 	}
 
-	public void setPrevID(BigInteger prevID) {
-		this.prevID = prevID;
+	public void setPrevId(BigInteger prevId) {
+		this.prevId = prevId;
 	}
 
-	public BigInteger getNextID() {
-		return this.nextID;
+	public BigInteger getNextId() {
+		return this.nextId;
 	}
 
-	public void setNextID(BigInteger nextID) {
-		this.nextID = nextID;
+	public void setNextId(BigInteger nextId) {
+		this.nextId = nextId;
 	}
 
 	public HashMap<BigInteger, String> getTexts() {

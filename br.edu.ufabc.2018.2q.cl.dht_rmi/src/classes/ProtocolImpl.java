@@ -79,16 +79,16 @@ public class ProtocolImpl implements Protocol {
 		HashMap<BigInteger, String> manter = new HashMap<BigInteger, String>();
 		HashMap<BigInteger, String> transferir = new HashMap<BigInteger, String>();
 
-		if (this.myStub == newStub && this.getNode().getMyID().compareTo(newId) == 0) {
+		if (this.myStub == newStub && this.getNode().getMyId().compareTo(newId) == 0) {
 
 			// corner case: primeiro no do DHT
 			this.predecessor = this.myStub;
 			this.sucessor = this.myStub;
-			this.getNode().setPrevID(this.getNode().getMyID());
-			this.getNode().setNextID(this.getNode().getMyID());
+			this.getNode().setPrevId(this.getNode().getMyId());
+			this.getNode().setNextId(this.getNode().getMyId());
 			newStub.join_ok(this.getMyStub(), this.getMyStub());
 
-		} else if (this.getNode().getMyID().compareTo(this.getNode().getPrevID()) <= 0 && this.getNode().getPrevID().compareTo(newId) < 0) {
+		} else if (this.getNode().getMyId().compareTo(this.getNode().getPrevId()) <= 0 && this.getNode().getPrevId().compareTo(newId) < 0) {
 
 			// corner case: no atual eh o menor do DHT, predecessor eh o maior do DHT
 			// corner case: newStub eh maior que o maior do DHT
@@ -104,7 +104,7 @@ public class ProtocolImpl implements Protocol {
 				}
 			}
 
-		} else if (this.getNode().getPrevID().compareTo(newId) < 0 && newId.compareTo(this.getNode().getMyID()) < 0) {
+		} else if (this.getNode().getPrevId().compareTo(newId) < 0 && newId.compareTo(this.getNode().getMyId()) < 0) {
 			// caso usual: predecessorID < newId < this.getNode().getMyID()
 			for (HashMap.Entry<BigInteger, String> entry: entradasAntigas.entrySet()) {
 				BigInteger chave = entry.getKey();
@@ -126,7 +126,7 @@ public class ProtocolImpl implements Protocol {
 
 		// atualiza o predecessor para o novo no
 		this.predecessor = newStub;
-		this.getNode().setPrevID(newId);
+		this.getNode().setPrevId(newId);
 
 		// efetua transferencia para o novo no
 		for (HashMap.Entry<BigInteger, String> entry: transferir.entrySet()) {
@@ -145,8 +145,8 @@ public class ProtocolImpl implements Protocol {
 		// atualiza o no atual, que eh novo, com o predecessor e sucessor
 		this.predecessor = predecessor;
 		this.sucessor = sucessor;
-		this.getNode().setPrevID(predecessor.getNode().getMyID());
-		this.getNode().setNextID(sucessor.getNode().getMyID());
+		this.getNode().setPrevId(predecessor.getNode().getMyId());
+		this.getNode().setNextId(sucessor.getNode().getMyId());
 
 		return this.predecessor.new_node(this.myStub);
 	}
@@ -155,7 +155,7 @@ public class ProtocolImpl implements Protocol {
 	public boolean new_node(Protocol newStub) throws RemoteException {
 		// atualiza o no atual, que ja esta na DHT, com o novo sucessor
 		this.sucessor = newStub;
-		this.getNode().setNextID(newStub.getNode().getMyID());
+		this.getNode().setNextId(newStub.getNode().getMyId());
 		return true;
 	}
 
@@ -163,7 +163,7 @@ public class ProtocolImpl implements Protocol {
 	public boolean leave(Protocol newStub) throws RemoteException {
 		// atualiza o no atual, que ja esta na DHT, com o novo predecessor
 		this.predecessor = newStub;
-		this.getNode().setPrevID(newStub.getNode().getMyID());
+		this.getNode().setPrevId(newStub.getNode().getMyId());
 		return true;
 	}
 
@@ -171,7 +171,7 @@ public class ProtocolImpl implements Protocol {
 	public boolean node_gone(Protocol newStub) throws RemoteException {
 		// atualiza o no atual, que ja esta na DHT, com o novo sucessor
 		this.sucessor = newStub;
-		this.getNode().setNextID(newStub.getNode().getMyID());
+		this.getNode().setNextId(newStub.getNode().getMyId());
 		return true;
 	}
 
