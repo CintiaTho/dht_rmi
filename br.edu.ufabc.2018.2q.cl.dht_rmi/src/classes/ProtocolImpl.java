@@ -117,7 +117,7 @@ public class ProtocolImpl implements Protocol {
 		}
 
 		//Avisa o node ingressante sobre sua entrada
-		newStub.join_ok(this.predecessor, this.myStub, this.getNode().getPrevId(), this.getNode().getMyId());
+		newStub.join_ok(this.predecessor, this.getMyStub(), this.getNode().getPrevId(), this.getNode().getMyId());
 
 		// atualiza o predecessor para o novo node
 		this.predecessor = newStub;
@@ -144,7 +144,7 @@ public class ProtocolImpl implements Protocol {
 		this.getNode().setNextId(nextId);
 		System.out.print("Sua entrada foi aceita e seu lugar na DHT encontrado...");
 		//Avisando seu novo Predecessor sobre sua entrada na DHT
-		if(this.predecessor.new_node(this.myStub, this.getNode().getMyId())) System.out.println("Informado seu Antecessor sobre sua presenca!");
+		if(this.predecessor.new_node(this.getMyStub(), this.getNode().getMyId())) System.out.println("Informado seu Antecessor sobre sua presenca!");
 		return true;
 	}
 
@@ -157,7 +157,7 @@ public class ProtocolImpl implements Protocol {
 
 	//Informando seus Vizinhos sobre sua saida e transferindo os Itens sob seu Node para seu Sucessor
 	public void begin_to_leave() throws RemoteException {
-		if(this.predecessor.equals(this.myStub) && this.sucessor.equals(this.myStub)) {
+		if(this.predecessor.equals(this.getMyStub()) && this.sucessor.equals(this.getMyStub())) {
 			System.out.println("Somente ha voce na DHT e todos os itens serão perdidos.");
 		}
 		else {
@@ -198,7 +198,7 @@ public class ProtocolImpl implements Protocol {
 	//Buscando e gravando um item novo na DHT
 	public boolean store(BigInteger key, String value, Protocol originStub) throws RemoteException {
 		//Caso haja apenas voce na DHT, armazenar
-		if (this.predecessor.equals(this.myStub) && this.sucessor.equals(this.myStub)) {
+		if (this.predecessor.equals(this.getMyStub()) && this.sucessor.equals(this.getMyStub())) {
 			this.transfer(key, value);
 		}
 
@@ -222,20 +222,38 @@ public class ProtocolImpl implements Protocol {
 	//Buscando e deletando um item na DHT
 	public boolean delete(BigInteger key, Protocol originStub) throws RemoteException{
 		String value = "";
-		
+
 		//Caso haja apenas voce na DHT, buscar localmente
-		if (this.predecessor.equals(this.myStub) && this.sucessor.equals(this.myStub)) {
-			
+		if (this.predecessor.equals(this.getMyStub()) && this.sucessor.equals(this.getMyStub())) {
+			if(this.node.getTexts().containsKey(key)) {
+				HashMap<BigInteger, String> update = this.getNode().getTexts();
+				value = update.get(key);
+				update.remove(key);
+				this.getNode().setTexts(update);
+			}
+			else return originStub.itenOk("not_found", key, value);
 		}
 
 		//Caso que a chave é maior que ID deste node mas este node é o maior da DHT (seu sucessor tem ID menor) - fica com o item 
 		else if (this.getNode().getMyId().compareTo(key) < 0 && this.getNode().getNextId().compareTo(this.getNode().getMyId())<0) {
-			
+			if(this.getNode().getTexts().containsKey(key)) {
+				HashMap<BigInteger, String> update = this.getNode().getTexts();
+				value = update.get(key);
+				update.remove(key);
+				this.getNode().setTexts(update);
+			}
+			else return originStub.itenOk("not_found", key, value);
 		}
 
 		//Caso que a chave é menor ou igual ao ID deste node e maior que o ID seu predecessor 
 		else if (this.getNode().getMyId().compareTo(key) >= 0 && this.getNode().getPrevId().compareTo(key)<0) {
-			
+			if(this.getNode().getTexts().containsKey(key)) {
+				HashMap<BigInteger, String> update = this.getNode().getTexts();
+				value = update.get(key);
+				update.remove(key);
+				this.getNode().setTexts(update);
+			}
+			else return originStub.itenOk("not_found", key, value);
 		}
 
 		// caso chave maior que seu ID e o proximo ID é maior que voce - encaminhar
@@ -247,8 +265,37 @@ public class ProtocolImpl implements Protocol {
 
 	//Buscando e devolvendo a quem solicitou um item na DHT
 	public boolean retrieve(BigInteger key, Protocol originStub) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		String value = "";
+
+		//Caso haja apenas voce na DHT, buscar localmente
+		if (this.predecessor.equals(this.getMyStub()) && this.sucessor.equals(this.getMyStub())) {
+			if(this.getNode().getTexts().containsKey(key)) {
+				value = this.getNode().getTexts().get(key);
+			}
+			else return originStub.itenOk("not_found", key, value);
+		}
+
+		//Caso que a chave é maior que ID deste node mas este node é o maior da DHT (seu sucessor tem ID menor) - fica com o item 
+		else if (this.getNode().getMyId().compareTo(key) < 0 && this.getNode().getNextId().compareTo(this.getNode().getMyId())<0) {
+			if(this.getNode().getTexts().containsKey(key)) {
+				value = this.getNode().getTexts().get(key);
+			}
+			else return originStub.itenOk("not_found", key, value);
+		}
+
+		//Caso que a chave é menor ou igual ao ID deste node e maior que o ID seu predecessor 
+		else if (this.getNode().getMyId().compareTo(key) >= 0 && this.getNode().getPrevId().compareTo(key)<0) {
+			if(this.getNode().getTexts().containsKey(key)) {
+				value = this.getNode().getTexts().get(key);
+			}
+			else return originStub.itenOk("not_found", key, value);
+		}
+
+		// caso chave maior que seu ID e o proximo ID é maior que voce - encaminhar
+		else {
+			return this.sucessor.delete(key, originStub);
+		}
+		return originStub.itenOk("retrieve", key, value);
 	}
 
 	//Recebendo a confirmacao do Item achado, guardado, deletado ou não encontrado na DHT
