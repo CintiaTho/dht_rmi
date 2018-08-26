@@ -23,6 +23,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Scanner;
 
 import classes.Node;
@@ -94,7 +95,8 @@ public class Dht {
 
 							//Busca os registros Stub presentes no arquivo
 							stubList = leituraStubTxt(nodesFile);
-
+							
+							System.out.println("Procurando e tentando entrar em uma DHT...");
 							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
 							//Faz isso ate achar um stub disponivel ou ate ser necessario criar uma nova rede;
 							if(!stubList.isEmpty()) {
@@ -216,18 +218,17 @@ public class Dht {
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
-							HashMap<BigInteger, String> view = new HashMap<>(); 
+							System.out.print("Estamos obtendo os dados...");
+							LinkedHashMap<BigInteger, String> view = new LinkedHashMap<>(); 
 							protocol.view(view);
-							//System.out.print("Estamos obtendo os dados...");
 							while(protocol.getView().isEmpty()) {
-								//System.out.print(".");
 							}
-							//System.out.println();
+							System.out.println("Resultado:");
 							for (HashMap.Entry<BigInteger, String> it : protocol.getView().entrySet()){  
 								System.out.println("NodeNome : "+it.getValue()+" / Id: "+it.getKey()+" -->");
 							}
 							System.out.println("Fim/Volta para o Início");
-							protocol.setView(new HashMap<>());
+							protocol.setView(new LinkedHashMap<>());
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -281,7 +282,19 @@ public class Dht {
 		System.out.println("Node criado!");
 		return protocol;
 	}
-
+	
+	//Metodo para gerar os IDs seguramente criptografados - tanto para os nos quanto para os itens
+	public static BigInteger gerarID(String frase, String algoritmoHash) {
+		System.out.print("Gerando o ID...");
+		try {
+			MessageDigest md = MessageDigest.getInstance(algoritmoHash);
+			md.update(frase.getBytes());
+			return new BigInteger(md.digest());
+		} catch (NoSuchAlgorithmException e) {
+			return null;
+		}
+	}
+	
 	//Metodo que efetua a atualizacao do arquivo TXT
 	public static void gravarStubTxt(ArrayList<Protocol> stubList, File nodesFile) {
 		System.out.print("Gravando/Atualizando o arquivo de Stubs...");
@@ -309,24 +322,12 @@ public class Dht {
 			in.close();
 		} catch (IOException ex) {
 			//ex.printStackTrace();
-			System.err.println("Arquivo de Stubs vazio: " + ex.toString());
+			System.err.print("<Arquivo de Stubs vazio: "+ex.toString()+">");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Leitura finalizada!");
+		System.out.println(" Leitura finalizada!");
 		return objetos;
-	}
-
-	//Metodo para gerar os IDs seguramente criptografados - tanto para os nos quanto para os itens
-	public static BigInteger gerarID(String frase, String algoritmoHash) {
-		System.out.print("Gerando o ID...");
-		try {
-			MessageDigest md = MessageDigest.getInstance(algoritmoHash);
-			md.update(frase.getBytes());
-			return new BigInteger(md.digest());
-		} catch (NoSuchAlgorithmException e) {
-			return null;
-		}
 	}
 
 }

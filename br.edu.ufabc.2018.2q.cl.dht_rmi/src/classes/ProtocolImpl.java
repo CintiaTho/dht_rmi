@@ -12,6 +12,7 @@ package classes;
 import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class ProtocolImpl implements Protocol {
 	private String myName;
@@ -19,7 +20,7 @@ public class ProtocolImpl implements Protocol {
 	private Protocol myStub;
 	private Protocol sucessor;
 	private Protocol predecessor;
-	private HashMap<BigInteger, String> view;
+	private LinkedHashMap<BigInteger, String> view;
 
 	public ProtocolImpl(Node node) {
 		this.node = node;
@@ -27,7 +28,7 @@ public class ProtocolImpl implements Protocol {
 		this.myStub = null;
 		this.predecessor = null;
 		this.sucessor = null;
-		this.view = new HashMap<>();
+		this.view = new LinkedHashMap<>();
 	}
 
 	public String getMyName() {
@@ -54,11 +55,11 @@ public class ProtocolImpl implements Protocol {
 		this.node = node;
 	}
 
-	public HashMap<BigInteger, String> getView() {
+	public LinkedHashMap<BigInteger,String> getView() {
 		return view;
 	}
 
-	public void setView(HashMap<BigInteger, String> view) {
+	public void setView(LinkedHashMap<BigInteger, String> view) {
 		this.view = view;
 	}
 
@@ -229,16 +230,16 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	//Buscando a organização dos nodes na DHT
-	public boolean view(HashMap<BigInteger, String> view) throws RemoteException {
+	public boolean view(LinkedHashMap<BigInteger, String> view) throws RemoteException {
 		//Caso em que ha apenas voce na DHT
 		if(this.predecessor.equals(this.myStub) && this.sucessor.equals(this.myStub)) {
-			System.out.println("Somente ha voce na DHT.");
+			System.out.print("Somente ha voce na DHT...");
 			view.put(this.getNode().getMyId(), this.getMyName());
 			this.setView(view);
 		}
 		//Quando deu-se uma volta completa na DHT capturando as infos de todos os nodes e volta pra voce
 		else if(view.containsKey(this.getNode().getMyId())) {
-			System.out.println("View Finalizada!");
+			System.out.print("View Finalizada...");
 			this.setView(view);
 		}
 		//Quando nao deu-se uma volta completa na DHT ainda, adiciona suas infos

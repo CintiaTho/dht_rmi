@@ -12,7 +12,7 @@ package classes;
 import java.math.BigInteger;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public interface Protocol extends Remote {
 	
@@ -28,9 +28,9 @@ public interface Protocol extends Remote {
 
 	public void setNode(Node node) throws RemoteException;
 	
-	public HashMap<BigInteger, String> getView() throws RemoteException;
+	public LinkedHashMap<BigInteger, String> getView() throws RemoteException;
 
-	public void setView(HashMap<BigInteger, String> view) throws RemoteException;
+	public void setView(LinkedHashMap<BigInteger, String> view) throws RemoteException;
 
 	public boolean join(Protocol newStub, BigInteger newId) throws RemoteException, RuntimeException;
 
@@ -58,6 +58,6 @@ public interface Protocol extends Remote {
 	
 	public boolean okDel() throws RemoteException;
 	
-	public boolean view(HashMap<BigInteger, String> view) throws RemoteException;
+	public boolean view(LinkedHashMap<BigInteger, String> view) throws RemoteException;
 
 }
