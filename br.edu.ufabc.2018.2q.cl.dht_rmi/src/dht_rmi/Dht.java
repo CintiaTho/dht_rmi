@@ -195,8 +195,8 @@ public class Dht {
 						while(protocol.getView().isEmpty()) {
 						}
 						//Imprime o retorno
-						for (HashMap.Entry<BigInteger, String> it : protocol.getView().entrySet()){  
-							System.out.println("Key : "+it.getValue()+" / Value: "+it.getKey());
+						for (HashMap.Entry<BigInteger, String> it : protocol.getView().entrySet()){
+							if(!it.getValue().equals("")) System.out.println("Key : "+it.getKey()+" / Value: "+it.getValue());
 						}
 						protocol.setView(new LinkedHashMap<>());
 						//-------
