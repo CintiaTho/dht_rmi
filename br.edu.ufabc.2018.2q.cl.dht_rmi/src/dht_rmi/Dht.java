@@ -107,7 +107,7 @@ public class Dht {
 									try{
 										//tentativa de entrar na rede comecando pelo node da lista mais antigo para o mais novo
 										teste = node.join(protocol.getMyStub(), protocol.getNode().getMyId());
-									}catch (ConnectException e) {
+									} catch (ConnectException e) {
 										//caso inativo - node indisponivel
 										remover.add(node);
 									}
@@ -128,7 +128,9 @@ public class Dht {
 							//insere o node novo na lista de stubs e atualiza o arquivo TXT
 							joined = true;
 							stubList.add(protocol.getMyStub());
-							gravarStubTxt(stubList, new File(file));
+							//Gravando as alteracoes no arquivo de Stubs
+							if(gravarStubTxt(stubList, new File(file))) System.out.println("Gravação/Atualização terminada!");
+							else System.out.println("Nao foi possivel gravar");
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -144,7 +146,9 @@ public class Dht {
 							protocol.begin_to_leave();
 							System.out.print("Tirando seu registro na Lista de Stubs...");
 							stubList.remove(protocol.getMyStub());
-							gravarStubTxt(stubList, new File(file));
+							//Gravando as alteracoes no arquivo de Stubs
+							if(gravarStubTxt(stubList, new File(file))) System.out.println("Gravação/Atualização terminada!");
+							else System.out.println("Nao foi possivel gravar");
 							//Atualizando a situação do node local -> Fora de uma DHT
 							joined = false;
 							//-------
@@ -289,8 +293,6 @@ public class Dht {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("Ocorreu um erro no servidor: " + e.toString());
-		} finally {
-			if(entrada != null) entrada.close();
 		}
 	}
 
@@ -329,7 +331,7 @@ public class Dht {
 	}
 	
 	//Metodo que efetua a atualizacao do arquivo TXT
-	public static void gravarStubTxt(ArrayList<Protocol> stubList, File nodesFile) {
+	public static boolean gravarStubTxt(ArrayList<Protocol> stubList, File nodesFile) {
 		System.out.print("Gravando/Atualizando o arquivo de Stubs...");
 		ObjectOutputStream out = null;
 		try {
@@ -337,10 +339,11 @@ public class Dht {
 			out.writeObject(stubList);
 			out.flush();
 			out.close();
-			System.out.println("Gravação/Atualização terminada!");
+			out = null;
 		} catch (IOException ex) {
-			System.out.println("Nao foi possivel gravar");
+			return false;
 		}
+		return true;
 	}
 
 	//Metodo que le e copia todos os itens armazenados no TXT
@@ -353,6 +356,7 @@ public class Dht {
 			in = new ObjectInputStream(new FileInputStream(nodesFile));
 			objetos = (ArrayList<Protocol>) in.readObject();
 			in.close();
+			in = null;
 		} catch (IOException ex) {
 			//ex.printStackTrace();
 			System.err.print("<Arquivo de Stubs vazio: "+ex.toString()+">");
