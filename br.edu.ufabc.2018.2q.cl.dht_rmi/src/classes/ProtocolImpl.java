@@ -135,7 +135,7 @@ public class ProtocolImpl implements Protocol {
 
 		return true;
 	}
-	
+
 	//Atualiza o node atual, que eh novo, com o predecessor e sucessor
 	public boolean join_ok(Protocol predecessor, Protocol sucessor, BigInteger prevId, BigInteger nextId) throws RemoteException {
 		this.predecessor = predecessor;
@@ -154,10 +154,10 @@ public class ProtocolImpl implements Protocol {
 		this.getNode().setNextId(newId);
 		return true;
 	}
-	
+
 	//Informando seus Vizinhos sobre sua saida e transferindo os Itens sob seu Node para seu Sucessor
 	public void begin_to_leave() throws RemoteException {
-		if(this.predecessor.equals(this.myStub) & this.sucessor.equals(this.myStub)) {
+		if(this.predecessor.equals(this.myStub) && this.sucessor.equals(this.myStub)) {
 			System.out.println("Somente ha voce na DHT e todos os itens serão perdidos.");
 		}
 		else {
@@ -196,38 +196,80 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	//Buscando e gravando um item novo na DHT
-	public boolean store(BigInteger key, String value) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	public boolean store(BigInteger key, String value, Protocol originStub) throws RemoteException {
+		//Caso haja apenas voce na DHT, armazenar
+		if (this.predecessor.equals(this.myStub) && this.sucessor.equals(this.myStub)) {
+			this.transfer(key, value);
+		}
 
-	//Buscando e devolvendo a quem solicitou um item na DHT
-	public boolean retrieve(BigInteger key) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+		//Caso que a chave é maior que ID deste node mas este node é o maior da DHT (seu sucessor tem ID menor) - fica com o item 
+		else if (this.getNode().getMyId().compareTo(key) < 0 && this.getNode().getNextId().compareTo(this.getNode().getMyId())<0) {
+			this.transfer(key, value);
+		}
 
-	//Recebendo a confirmacao do Item achado na DHT
-	public boolean ok() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+		//Caso que a chave é menor ou igual ao ID deste node e maior que o ID seu predecessor 
+		else if (this.getNode().getMyId().compareTo(key) >= 0 && this.getNode().getPrevId().compareTo(key)<0) {
+			this.transfer(key, value);
+		}
 
-	//Recebendo a informacao da inexistencia do Item procurado na DHT
-	public boolean not_found() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		// caso chave maior que seu ID e o proximo ID é maior que voce - encaminhar
+		else {
+			return this.sucessor.store(key, value, originStub);
+		}
+		return originStub.itenOk("stored", key, value);
 	}
 
 	//Buscando e deletando um item na DHT
-	public void delete(BigInteger key) throws RemoteException{
+	public boolean delete(BigInteger key, Protocol originStub) throws RemoteException{
+		String value = "";
+		
+		//Caso haja apenas voce na DHT, buscar localmente
+		if (this.predecessor.equals(this.myStub) && this.sucessor.equals(this.myStub)) {
+			
+		}
 
+		//Caso que a chave é maior que ID deste node mas este node é o maior da DHT (seu sucessor tem ID menor) - fica com o item 
+		else if (this.getNode().getMyId().compareTo(key) < 0 && this.getNode().getNextId().compareTo(this.getNode().getMyId())<0) {
+			
+		}
+
+		//Caso que a chave é menor ou igual ao ID deste node e maior que o ID seu predecessor 
+		else if (this.getNode().getMyId().compareTo(key) >= 0 && this.getNode().getPrevId().compareTo(key)<0) {
+			
+		}
+
+		// caso chave maior que seu ID e o proximo ID é maior que voce - encaminhar
+		else {
+			return this.sucessor.delete(key, originStub);
+		}
+		return originStub.itenOk("deleted", key, value);
 	}
 
-	//Recebendo a confirmacao do Item achado e deletado na DHT
-	public boolean okDel() throws RemoteException {
+	//Buscando e devolvendo a quem solicitou um item na DHT
+	public boolean retrieve(BigInteger key, Protocol originStub) throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	//Recebendo a confirmacao do Item achado, guardado, deletado ou não encontrado na DHT
+	public boolean itenOk(String reply, BigInteger key, String value) throws RemoteException {
+		if(reply.equals("stored")) {
+			System.out.println("Item guardado!");
+			this.view.put(key, value);
+		}
+		else if(reply.equals("not_found")) {
+			System.out.println("Item não encontrado na DHT!");
+			this.view.put(key, value);
+		}
+		else if(reply.equals("deleted")) {
+			System.out.println("Item deletado da DHT!");
+			this.view.put(key, value);
+		}
+		else if(reply.equals("retrieve")) {
+			System.out.println("Item encontrado na DHT!");
+			this.view.put(key, value);
+		}
+		return true;
 	}
 
 	//Buscando a organização dos nodes na DHT

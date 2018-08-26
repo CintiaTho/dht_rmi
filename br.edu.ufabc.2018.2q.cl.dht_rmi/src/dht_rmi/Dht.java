@@ -161,7 +161,7 @@ public class Dht {
 							System.out.print("Informe o valor que sera atribuido a chave previamente informada: ");
 							text = entrada.nextLine();
 							String value = text;
-							protocol.store(key, value);
+							protocol.store(key, value, protocol.getMyStub());
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -175,7 +175,17 @@ public class Dht {
 						text = entrada.nextLine();
 						String keyText = text;
 						BigInteger key = gerarID(keyText, algoritmoHash);
-						protocol.retrieve(key);
+						
+						LinkedHashMap<BigInteger, String> view = new LinkedHashMap<>(); 
+						protocol.retrieve(key, protocol.getMyStub());
+						while(protocol.getView().isEmpty()) {
+						}
+						System.out.println("Resultado:");
+						for (HashMap.Entry<BigInteger, String> it : protocol.getView().entrySet()){  
+							System.out.println("NodeNome : "+it.getValue()+" / Id: "+it.getKey()+" -->");
+						}
+						System.out.println("Fim/Volta para o Início");
+						protocol.setView(new LinkedHashMap<>());
 						//-------
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
 					break;
@@ -190,7 +200,7 @@ public class Dht {
 							text = entrada.nextLine();
 							String keyText = text;
 							BigInteger key = gerarID(keyText, algoritmoHash);
-							protocol.delete(key);
+							protocol.delete(key, protocol.getMyStub());
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");

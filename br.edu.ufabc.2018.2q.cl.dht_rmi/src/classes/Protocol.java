@@ -46,17 +46,13 @@ public interface Protocol extends Remote {
 
 	public boolean transfer(BigInteger key, String value) throws RemoteException;
 
-	public boolean store(BigInteger key, String value) throws RemoteException;
-
-	public boolean retrieve(BigInteger key) throws RemoteException;
+	public boolean store(BigInteger key, String value, Protocol originStub) throws RemoteException;
 	
-	public boolean ok() throws RemoteException;
-
-	public boolean not_found() throws RemoteException;
+	public boolean delete(BigInteger key, Protocol originStub) throws RemoteException;
 	
-	public void delete(BigInteger key) throws RemoteException;
+	public boolean retrieve(BigInteger key, Protocol originStub) throws RemoteException;
 	
-	public boolean okDel() throws RemoteException;
+	public boolean itenOk(String reply, BigInteger key, String value) throws RemoteException;
 	
 	public boolean view(LinkedHashMap<BigInteger, String> view) throws RemoteException;
 
