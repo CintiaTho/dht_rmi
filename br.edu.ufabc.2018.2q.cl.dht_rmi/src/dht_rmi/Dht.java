@@ -146,6 +146,7 @@ public class Dht {
 							System.out.print("Tirando seu registro na Lista de Stubs...");
 							stubList.remove(protocol.getMyStub());
 							gravarStubTxt(stubList, nodesFile);
+							//Atualizando a situação do node local -> Fora de uma DHT
 							joined = false;
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");

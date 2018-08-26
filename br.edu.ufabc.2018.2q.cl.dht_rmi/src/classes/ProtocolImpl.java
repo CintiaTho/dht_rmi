@@ -293,7 +293,7 @@ public class ProtocolImpl implements Protocol {
 
 		// caso chave maior que seu ID e o proximo ID é maior que voce - encaminhar
 		else {
-			return this.sucessor.delete(key, originStub);
+			return this.sucessor.retrieve(key, originStub);
 		}
 		return originStub.itenOk("retrieve", key, value);
 	}
