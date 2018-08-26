@@ -143,6 +143,7 @@ public class ProtocolImpl implements Protocol {
 		this.getNode().setPrevId(prevId);
 		this.getNode().setNextId(nextId);
 		System.out.print("Sua entrada foi aceita e seu lugar na DHT encontrado...");
+		//Avisando seu novo Predecessor sobre sua entrada na DHT
 		if(this.predecessor.new_node(this.myStub, this.getNode().getMyId())) System.out.println("Informado seu Antecessor sobre sua presenca!");
 		return true;
 	}
