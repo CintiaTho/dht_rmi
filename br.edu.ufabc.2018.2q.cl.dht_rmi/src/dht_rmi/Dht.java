@@ -36,6 +36,7 @@ public class Dht {
 	public static void main(String[] args) {
 		//Criacao de variaveis de trabalho dos metodos dessa classe
 		Protocol protocol = null;
+		boolean joined = false;
 
 		ArrayList<Protocol> stubList = new ArrayList<Protocol>();
 		File nodesFile = new File("./src/dht_rmi/nodes_list.txt");
@@ -65,7 +66,7 @@ public class Dht {
 				//switch-case dos comandos possiveis
 				switch (comando){
 				case "commands":
-					if(protocol == null) {
+					if(!joined) {
 						System.out.println("Gostaria de: ");
 						System.out.println("join - Participar de uma DHT;");
 						System.out.println("quit - Terminar esta sessao;");
@@ -85,13 +86,13 @@ public class Dht {
 				case "join":
 					//Usando um Arquivo txt local compartilhado apenas para nossos testes, em uma situacao "real" este arquivo seria disponibilizado "online" para quem quer entrar na rede;
 					//Quando um no entrar na rede, ele grava a si proprio, e quando sair da rede nao apaga a si proprio do arquivo (na situacao "real", ele gravaria o antecessor e o sucessor para tentar manter a lista)
-					if(protocol==null) {
+					if(!joined) {
 						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
-							//Cria o no (cria o ID e Stub)
-							protocol = criarNodeDHT(protocol, algoritmoHash);
+							//Cria o no (cria o ID e Stub) se não criado
+							if(protocol==null) protocol = criarNodeDHT(protocol, algoritmoHash);
 
 							//Busca os registros Stub presentes no arquivo
 							stubList = leituraStubTxt(nodesFile);
@@ -126,6 +127,7 @@ public class Dht {
 							}
 
 							//insere o node novo na lista de stubs e atualiza o arquivo TXT
+							joined = true;
 							stubList.add(protocol.getMyStub());
 							gravarStubTxt(stubList, nodesFile);
 							//-------
@@ -135,13 +137,13 @@ public class Dht {
 					break;
 					//-------------------------------------------------
 				case "leave":
-					if(protocol!=null) {
+					if(joined) {
 						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
 							//-------
 							protocol.begin_to_leave();
-							protocol = null;
+							joined = false;
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -149,7 +151,7 @@ public class Dht {
 					break;
 					//-------------------------------------------------
 				case "store":
-					if(protocol!=null) {
+					if(joined) {
 						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
@@ -176,7 +178,7 @@ public class Dht {
 					break;
 					//-------------------------------------------------
 				case "retrieve":
-					if(protocol!=null) {
+					if(joined) {
 						//-------
 						System.out.print("Informe a chave necessaria para recuperar o item: ");
 						text = entrada.nextLine();
@@ -199,7 +201,7 @@ public class Dht {
 					break;
 					//-------------------------------------------------
 				case "delete":
-					if(protocol!=null) {
+					if(joined) {
 						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
@@ -223,7 +225,7 @@ public class Dht {
 					break;
 					//-------------------------------------------------
 				case "viewItens":
-					if(protocol!=null) {
+					if(joined) {
 						//-------
 						if(protocol.getNode().getTexts().isEmpty()) System.out.println("Não há Itens no seu Node.");
 						else {
@@ -238,7 +240,7 @@ public class Dht {
 					break;
 					//-------------------------------------------------
 				case "viewDHT":
-					if(protocol!=null) {
+					if(joined) {
 						System.out.print("Quer realmente realizar esta acao? (s/n) ");
 						text = entrada.nextLine();
 						if(text.equals("s")){
