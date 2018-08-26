@@ -113,7 +113,8 @@ public class ProtocolImpl implements Protocol {
 
 		} else {
 			// caso nao seja o destinatario, deve encaminhar para o sucessor (3.2)
-			return this.sucessor.join(newStub, newId);
+			this.sucessor.join(newStub, newId);
+			return true;
 		}
 
 		//Avisa o node ingressante sobre sua entrada
@@ -214,9 +215,11 @@ public class ProtocolImpl implements Protocol {
 
 		// caso chave maior que seu ID e o proximo ID é maior que voce - encaminhar
 		else {
-			return this.sucessor.store(key, value, originStub);
+			this.sucessor.store(key, value, originStub);
+			return true;
 		}
-		return originStub.itenOk("stored", key, value);
+		originStub.itenOk("stored", key, value);
+		return true;
 	}
 
 	//Buscando e deletando um item na DHT
@@ -231,7 +234,10 @@ public class ProtocolImpl implements Protocol {
 				update.remove(key);
 				this.getNode().setTexts(update);
 			}
-			else return originStub.itenOk("not_found", key, value);
+			else {
+				originStub.itenOk("not_found", key, value);
+				return true;
+			}
 		}
 
 		//Caso que a chave é maior que ID deste node mas este node é o maior da DHT (seu sucessor tem ID menor) - fica com o item 
@@ -242,7 +248,10 @@ public class ProtocolImpl implements Protocol {
 				update.remove(key);
 				this.getNode().setTexts(update);
 			}
-			else return originStub.itenOk("not_found", key, value);
+			else {
+				originStub.itenOk("not_found", key, value);
+				return true;
+			}
 		}
 
 		//Caso que a chave é menor ou igual ao ID deste node e maior que o ID seu predecessor 
@@ -253,14 +262,19 @@ public class ProtocolImpl implements Protocol {
 				update.remove(key);
 				this.getNode().setTexts(update);
 			}
-			else return originStub.itenOk("not_found", key, value);
+			else {
+				originStub.itenOk("not_found", key, value);
+				return true;
+			}
 		}
 
 		// caso chave maior que seu ID e o proximo ID é maior que voce - encaminhar
 		else {
-			return this.sucessor.delete(key, originStub);
+			this.sucessor.delete(key, originStub);
+			return true;
 		}
-		return originStub.itenOk("deleted", key, value);
+		originStub.itenOk("deleted", key, value);
+		return true;
 	}
 
 	//Buscando e devolvendo a quem solicitou um item na DHT
@@ -272,7 +286,10 @@ public class ProtocolImpl implements Protocol {
 			if(this.getNode().getTexts().containsKey(key)) {
 				value = this.getNode().getTexts().get(key);
 			}
-			else return originStub.itenOk("not_found", key, value);
+			else {
+				originStub.itenOk("not_found", key, value);
+				return true;
+			}
 		}
 
 		//Caso que a chave é maior que ID deste node mas este node é o maior da DHT (seu sucessor tem ID menor) - fica com o item 
@@ -280,7 +297,10 @@ public class ProtocolImpl implements Protocol {
 			if(this.getNode().getTexts().containsKey(key)) {
 				value = this.getNode().getTexts().get(key);
 			}
-			else return originStub.itenOk("not_found", key, value);
+			else {
+				originStub.itenOk("not_found", key, value);
+				return true;
+			}
 		}
 
 		//Caso que a chave é menor ou igual ao ID deste node e maior que o ID seu predecessor 
@@ -288,14 +308,19 @@ public class ProtocolImpl implements Protocol {
 			if(this.getNode().getTexts().containsKey(key)) {
 				value = this.getNode().getTexts().get(key);
 			}
-			else return originStub.itenOk("not_found", key, value);
+			else {
+				originStub.itenOk("not_found", key, value);
+				return true;
+			}
 		}
 
 		// caso chave maior que seu ID e o proximo ID é maior que voce - encaminhar
 		else {
-			return this.sucessor.retrieve(key, originStub);
+			this.sucessor.retrieve(key, originStub);
+			return true;
 		}
-		return originStub.itenOk("retrieve", key, value);
+		originStub.itenOk("retrieve", key, value);
+		return true;
 	}
 
 	//Recebendo a confirmacao do Item achado, guardado, deletado ou não encontrado na DHT
