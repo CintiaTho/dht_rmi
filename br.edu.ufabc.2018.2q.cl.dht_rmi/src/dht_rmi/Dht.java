@@ -40,7 +40,7 @@ public class Dht {
 
 		ArrayList<Protocol> stubList = new ArrayList<Protocol>();
 		File nodesFile = new File("./src/dht_rmi/nodes_list.txt");
-
+		String file = "./src/dht_rmi/nodes_list.txt";
 		String algoritmoHash = "MD5";
 
 		Scanner entrada = new Scanner(System.in);
@@ -95,6 +95,7 @@ public class Dht {
 							if(protocol==null) protocol = criarNodeDHT(protocol, algoritmoHash);
 
 							//Busca os registros Stub presentes no arquivo
+							nodesFile = new File("./src/dht_rmi/nodes_list.txt");
 							stubList = leituraStubTxt(nodesFile);
 							
 							System.out.println("Procurando e tentando entrar em uma DHT...");
