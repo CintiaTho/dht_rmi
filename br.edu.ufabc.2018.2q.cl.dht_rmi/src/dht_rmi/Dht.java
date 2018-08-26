@@ -39,7 +39,6 @@ public class Dht {
 		boolean joined = false;
 
 		ArrayList<Protocol> stubList = new ArrayList<Protocol>();
-		File nodesFile = new File("./src/dht_rmi/nodes_list.txt");
 		String file = "./src/dht_rmi/nodes_list.txt";
 		String algoritmoHash = "MD5";
 
@@ -95,8 +94,7 @@ public class Dht {
 							if(protocol==null) protocol = criarNodeDHT(protocol, algoritmoHash);
 
 							//Busca os registros Stub presentes no arquivo
-							nodesFile = new File("./src/dht_rmi/nodes_list.txt");
-							stubList = leituraStubTxt(nodesFile);
+							stubList = leituraStubTxt(new File(file));
 							
 							System.out.println("Procurando e tentando entrar em uma DHT...");
 							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
@@ -130,7 +128,7 @@ public class Dht {
 							//insere o node novo na lista de stubs e atualiza o arquivo TXT
 							joined = true;
 							stubList.add(protocol.getMyStub());
-							gravarStubTxt(stubList, nodesFile);
+							gravarStubTxt(stubList, new File(file));
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -146,7 +144,7 @@ public class Dht {
 							protocol.begin_to_leave();
 							System.out.print("Tirando seu registro na Lista de Stubs...");
 							stubList.remove(protocol.getMyStub());
-							gravarStubTxt(stubList, nodesFile);
+							gravarStubTxt(stubList, new File(file));
 							//Atualizando a situação do node local -> Fora de uma DHT
 							joined = false;
 							//-------
