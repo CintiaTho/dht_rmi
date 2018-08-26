@@ -40,7 +40,7 @@ public class Dht {
 
 		ArrayList<Protocol> stubList = new ArrayList<Protocol>();
 		String file = "./src/dht_rmi/nodes_list.txt";
-		File stubFile = new File(file);
+		File nodesFile = new File(file);
 		String algoritmoHash = "MD5";
 
 		Scanner entrada = new Scanner(System.in);
@@ -95,7 +95,7 @@ public class Dht {
 							if(protocol==null) protocol = criarNodeDHT(protocol, algoritmoHash);
 							
 							//Busca os registros Stub presentes no arquivo
-							stubList = leituraStubTxt(stubFile);
+							stubList = leituraStubTxt(nodesFile);
 							
 							System.out.println("Procurando e tentando entrar em uma DHT...");
 							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
@@ -130,7 +130,7 @@ public class Dht {
 							joined = true;
 							stubList.add(protocol.getMyStub());
 							//Gravando as alteracoes no arquivo de Stubs
-							if(gravarStubTxt(stubList, stubFile)) System.out.println("Gravação/Atualização terminada!");
+							if(gravarStubTxt(stubList, nodesFile)) System.out.println("Gravação/Atualização terminada!");
 							else System.out.println("Nao foi possivel gravar");
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
@@ -146,9 +146,10 @@ public class Dht {
 							//-------
 							protocol.begin_to_leave();
 							System.out.print("Tirando seu registro na Lista de Stubs...");
+							leituraStubTxt(nodesFile);
 							stubList.remove(protocol.getMyStub());
 							//Gravando as alteracoes no arquivo de Stubs
-							if(gravarStubTxt(stubList, stubFile)) System.out.println("Gravação/Atualização terminada!");
+							if(gravarStubTxt(stubList, nodesFile)) System.out.println("Gravação/Atualização terminada!");
 							else System.out.println("Nao foi possivel gravar");
 							//Atualizando a situação do node local -> Fora de uma DHT
 							joined = false;
