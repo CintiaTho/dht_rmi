@@ -228,7 +228,7 @@ public class ProtocolImpl implements Protocol {
 
 		//Caso haja apenas voce na DHT, buscar localmente
 		if (this.predecessor.equals(this.getMyStub()) && this.sucessor.equals(this.getMyStub())) {
-			if(this.node.getTexts().containsKey(key)) {
+			if(this.getNode().getTexts().containsKey(key)) {
 				HashMap<BigInteger, String> update = this.getNode().getTexts();
 				value = update.get(key);
 				update.remove(key);
@@ -239,7 +239,7 @@ public class ProtocolImpl implements Protocol {
 				return true;
 			}
 		}
-
+		
 		//Caso que a chave é maior que ID deste node mas este node é o maior da DHT (seu sucessor tem ID menor) - fica com o item 
 		else if (this.getNode().getMyId().compareTo(key) < 0 && this.getNode().getNextId().compareTo(this.getNode().getMyId())<0) {
 			if(this.getNode().getTexts().containsKey(key)) {
