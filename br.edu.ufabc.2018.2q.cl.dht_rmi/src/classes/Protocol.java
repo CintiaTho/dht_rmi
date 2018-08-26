@@ -50,11 +50,13 @@ public interface Protocol extends Remote {
 
 	public boolean retrieve(BigInteger key) throws RemoteException;
 	
-	public void delete(BigInteger key) throws RemoteException;
-
 	public boolean ok() throws RemoteException;
 
 	public boolean not_found() throws RemoteException;
+	
+	public void delete(BigInteger key) throws RemoteException;
+	
+	public boolean okDel() throws RemoteException;
 	
 	public boolean view(HashMap<BigInteger, String> view) throws RemoteException;
 

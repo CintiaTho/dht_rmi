@@ -91,16 +91,16 @@ public class Dht {
 							//-------
 							//Cria o no (cria o ID e Stub)
 							protocol = criarNodeDHT(protocol, algoritmoHash);
-							
+
 							//Busca os registros Stub presentes no arquivo
 							stubList = leituraStubTxt(nodesFile);
-							
+
 							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
 							//Faz isso ate achar um stub disponivel ou ate ser necessario criar uma nova rede;
 							if(!stubList.isEmpty()) {
 								Boolean teste = false;
 								ArrayList<Protocol> remover = new ArrayList<>();
-	
+
 								for(Protocol node: stubList) {
 									try{
 										//tentativa de entrar na rede comecando pelo node da lista mais antigo para o mais novo
@@ -111,7 +111,7 @@ public class Dht {
 									}
 									if(teste) break;
 								}
-	
+
 								//remove os stubs conhecidamente inativos
 								for(Protocol node: remover) {
 									stubList.remove(node);
@@ -122,7 +122,7 @@ public class Dht {
 							if(stubList.isEmpty()) {
 								protocol.join(protocol.getMyStub(), protocol.getNode().getMyId());
 							}
-							
+
 							//insere o node novo na lista de stubs e atualiza o arquivo TXT
 							stubList.add(protocol.getMyStub());
 							gravarStubTxt(stubList, nodesFile);
@@ -139,6 +139,7 @@ public class Dht {
 						if(text.equals("s")){
 							//-------
 							protocol.begin_to_leave();
+							protocol = null;
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -261,7 +262,6 @@ public class Dht {
 
 	//Metodo usado para criar o no atrelado a aplicacao instanciada (rodando localmente)
 	public static Protocol criarNodeDHT(Protocol protocol, String algoritmoHash) {
-		System.out.print("Criando o seu Node...");
 		Node node = new NodeImpl();
 		protocol = new ProtocolImpl(node);
 		try {

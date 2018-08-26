@@ -53,7 +53,7 @@ public class ProtocolImpl implements Protocol {
 	public void setNode(Node node) {
 		this.node = node;
 	}
-	
+
 	public HashMap<BigInteger, String> getView() {
 		return view;
 	}
@@ -70,15 +70,17 @@ public class ProtocolImpl implements Protocol {
 		HashMap<BigInteger, String> transferir = new HashMap<BigInteger, String>();
 
 		if (this.myStub == newStub && this.getNode().getMyId().compareTo(newId) == 0) {
-
 			// corner case: primeiro no do DHT
 			System.out.println("Voce e o primeiro node na rede - Criada uma nova DHT!");
-			this.sucessor = this.myStub;
-			this.getNode().setNextId(this.getNode().getMyId());
+			this.sucessor = newStub;
+			this.predecessor = newStub;
+			this.getNode().setPrevId(newId);
+			this.getNode().setNextId(newId);
 			//newStub.join_ok(this.getMyStub(), this.getMyStub(), this.getNode().getMyId(), this.getNode().getMyId());
+			return true;
+		} 
 
-		} else if (this.getNode().getMyId().compareTo(this.getNode().getPrevId()) <= 0 && this.getNode().getPrevId().compareTo(newId) < 0) {
-
+		else if(this.getNode().getMyId().compareTo(this.getNode().getPrevId()) <= 0 && this.getNode().getPrevId().compareTo(newId) < 0) {
 			// corner case: node atual eh o menor do DHT, predecessor eh o maior do DHT
 			// corner case: newStub eh maior que o maior do DHT
 			// como o node atual eh o menor do DHT e eh quem envia o transfer, deve conter as entradas maiores que o maior do DHT
@@ -93,7 +95,9 @@ public class ProtocolImpl implements Protocol {
 				}
 			}
 
-		} else if (this.getNode().getPrevId().compareTo(newId) < 0 && newId.compareTo(this.getNode().getMyId()) < 0) {
+		} 
+
+		else if (this.getNode().getPrevId().compareTo(newId) < 0 && newId.compareTo(this.getNode().getMyId()) < 0) {
 			// caso usual: predecessorID < newId < this.getNode().getMyID()
 			for (HashMap.Entry<BigInteger, String> entry: entradasAntigas.entrySet()) {
 				BigInteger chave = entry.getKey();
@@ -111,11 +115,14 @@ public class ProtocolImpl implements Protocol {
 			return this.sucessor.join(newStub, newId);
 		}
 
-		// atualiza o predecessor para o novo no
+		//Avisa o node ingressante sobre sua entrada
+		newStub.join_ok(this.predecessor, this.myStub, this.getNode().getPrevId(), this.getNode().getMyId());
+
+		// atualiza o predecessor para o novo node
 		this.predecessor = newStub;
 		this.getNode().setPrevId(newId);
 
-		// efetua transferencia para o novo no
+		// efetua transferencia para o novo node
 		for (HashMap.Entry<BigInteger, String> entry: transferir.entrySet()) {
 			BigInteger chave = entry.getKey();
 			String valor = entry.getValue();
@@ -127,105 +134,117 @@ public class ProtocolImpl implements Protocol {
 
 		return true;
 	}
-
+	
+	//Atualiza o node atual, que eh novo, com o predecessor e sucessor
 	public boolean join_ok(Protocol predecessor, Protocol sucessor, BigInteger prevId, BigInteger nextId) throws RemoteException {
-		// atualiza o node atual, que eh novo, com o predecessor e sucessor
 		this.predecessor = predecessor;
 		this.sucessor = sucessor;
 		this.getNode().setPrevId(prevId);
 		this.getNode().setNextId(nextId);
-		System.out.print("Sua entrada foi aceita e seu lugar encontrado...");
-		return this.predecessor.new_node(this.myStub, this.getNode().getMyId());
+		System.out.print("Sua entrada foi aceita e seu lugar na DHT encontrado...");
+		if(this.predecessor.new_node(this.myStub, this.getNode().getMyId())) System.out.println("Informado seu Antecessor sobre sua presenca!");
+		return true;
 	}
 
-	@Override
+	//Atualiza o node atual, que ja esta na DHT, com o novo sucessor que esta entrando na DHT
 	public boolean new_node(Protocol newStub, BigInteger newId) throws RemoteException {
-		// atualiza o node atual, que ja esta na DHT, com o novo sucessor
 		this.sucessor = newStub;
 		this.getNode().setNextId(newId);
-		System.out.println("Informado seu Antecessor sobre sua presenca!");
 		return true;
 	}
 	
+	//Informando seus Vizinhos sobre sua saida e transferindo os Itens sob seu Node para seu Sucessor
 	public void begin_to_leave() throws RemoteException {
-		this.sucessor.leave(this.predecessor, this.getNode().getPrevId());
-		this.predecessor.node_gone(this.sucessor, this.getNode().getNextId());
-
-		HashMap<BigInteger, String> entradasAntigas = this.getNode().getTexts();
-		for (HashMap.Entry<BigInteger, String> entry: entradasAntigas.entrySet()) {
-			BigInteger chave = entry.getKey();
-			String valor = entry.getValue();
-			this.sucessor.transfer(chave, valor);
+		if(this.predecessor.equals(this.myStub) & this.sucessor.equals(this.myStub)) {
+			System.out.println("Somente ha voce na DHT e todos os itens serão perdidos.");
 		}
+		else {
+			if(this.sucessor.leave(this.predecessor, this.getNode().getPrevId())) System.out.print("Informado seu Sucessor sobre sua saida...");
+			if(this.predecessor.node_gone(this.sucessor, this.getNode().getNextId())) System.out.print("Informado seu Antecessor sobre sua saida...");
+
+			System.out.print("Transferindo os Itens para o seu Sucessor...");
+			HashMap<BigInteger, String> entradasAntigas = this.getNode().getTexts();
+			for (HashMap.Entry<BigInteger, String> entry: entradasAntigas.entrySet()) {
+				BigInteger chave = entry.getKey();
+				String valor = entry.getValue();
+				if(this.sucessor.transfer(chave, valor)) System.out.print("Item...");
+			}
+		}
+		System.out.println("Saida efetuada!");
 	}
 
-	@Override
+	//Atualiza o node atual, que ja esta na DHT, com um novo predecessor que era do antigo node que esta saindo
 	public boolean leave(Protocol predecessor, BigInteger prevId) throws RemoteException {
-		// atualiza o no atual, que ja esta na DHT, com o novo predecessor
-		System.out.print("Informado seu Sucessor sobre sua saida...");
 		this.predecessor = predecessor;
 		this.getNode().setPrevId(predecessor.getNode().getMyId());
 		return true;
 	}
 
-	@Override
+	//Atualiza o node atual, que ja esta na DHT, com o novo sucessor que era do antigo node que esta saindo
 	public boolean node_gone(Protocol sucessor, BigInteger nextId) throws RemoteException {
-		// atualiza o no atual, que ja esta na DHT, com o novo sucessor
-		System.out.print("Informado seu Antecessor sobre sua saida...");
 		this.sucessor = sucessor;
 		this.getNode().setNextId(sucessor.getNode().getMyId());
 		return true;
 	}
 
-	@Override
+	//Recebendo um item que era do antigo node predecessor que esta saindo
 	public boolean transfer(BigInteger key, String value) throws RemoteException {
 		this.node.insertText(key, value);
 		return true;
 	}
 
-	@Override
+	//Buscando e gravando um item novo na DHT
 	public boolean store(BigInteger key, String value) throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
+	//Buscando e devolvendo a quem solicitou um item na DHT
 	public boolean retrieve(BigInteger key) throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
-	@Override
-	public void delete(BigInteger key) throws RemoteException{
 
-	}
-	
-	@Override
+	//Recebendo a confirmacao do Item achado na DHT
 	public boolean ok() throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
+	//Recebendo a informacao da inexistencia do Item procurado na DHT
 	public boolean not_found() throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
+	//Buscando e deletando um item na DHT
+	public void delete(BigInteger key) throws RemoteException{
+
+	}
+
+	//Recebendo a confirmacao do Item achado e deletado na DHT
+	public boolean okDel() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	//Buscando a organização dos nodes na DHT
 	public boolean view(HashMap<BigInteger, String> view) throws RemoteException {
-		if(this.predecessor.equals(this.myStub) & this.sucessor.equals(this.myStub)) {
+		//Caso em que ha apenas voce na DHT
+		if(this.predecessor.equals(this.myStub) && this.sucessor.equals(this.myStub)) {
 			System.out.println("Somente ha voce na DHT.");
 			view.put(this.getNode().getMyId(), this.getMyName());
 			this.setView(view);
 		}
+		//Quando deu-se uma volta completa na DHT capturando as infos de todos os nodes e volta pra voce
 		else if(view.containsKey(this.getNode().getMyId())) {
 			System.out.println("View Finalizada!");
-			view.put(this.getNode().getMyId(), this.getMyName());
 			this.setView(view);
 		}
+		//Quando nao deu-se uma volta completa na DHT ainda, adiciona suas infos
 		else {
-		System.out.print("Adicionando Node na View...");
-		view.put(this.getNode().getMyId(), this.getMyName());
+			view.put(this.getNode().getMyId(), this.getMyName());
+			this.sucessor.view(view);
 		}
 		return true;
 	}
