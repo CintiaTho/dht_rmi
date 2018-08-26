@@ -254,13 +254,13 @@ public class Dht {
 							while(protocol.getView().isEmpty()) {
 							}
 							System.out.println("Resultado:");
-							System.out.println(" ____");
+							System.out.println(".----.");
 							for (HashMap.Entry<BigInteger, String> it : protocol.getView().entrySet()){
-								System.out.println("|    |");
-								System.out.println("|    V");
-								System.out.println("| NodeNome : "+it.getValue()+" / Id: "+it.getKey());
+								System.out.println(":    V");
+								System.out.println(": NodeNome : "+it.getValue()+" / Id: "+it.getKey());
+								System.out.println(":    :");
 							}
-							System.out.println("|____/");
+							System.out.println("`----´");
 							protocol.setView(new LinkedHashMap<>());
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
