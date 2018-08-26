@@ -161,7 +161,14 @@ public class Dht {
 							System.out.print("Informe o valor que sera atribuido a chave previamente informada: ");
 							text = entrada.nextLine();
 							String value = text;
+							
+							//Comeca a procura
+							LinkedHashMap<BigInteger, String> view = new LinkedHashMap<>(); 
 							protocol.store(key, value, protocol.getMyStub());
+							//Espera o fim da execucao
+							while(protocol.getView().isEmpty()) {
+							}
+							protocol.setView(new LinkedHashMap<>());
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
@@ -176,15 +183,16 @@ public class Dht {
 						String keyText = text;
 						BigInteger key = gerarID(keyText, algoritmoHash);
 						
+						//Comeca a procura
 						LinkedHashMap<BigInteger, String> view = new LinkedHashMap<>(); 
 						protocol.retrieve(key, protocol.getMyStub());
+						//Espera o fim da execucao
 						while(protocol.getView().isEmpty()) {
 						}
-						System.out.println("Resultado:");
+						//Imprime o retorno
 						for (HashMap.Entry<BigInteger, String> it : protocol.getView().entrySet()){  
-							System.out.println("NodeNome : "+it.getValue()+" / Id: "+it.getKey()+" -->");
+							System.out.println("Key : "+it.getValue()+" / Value: "+it.getKey());
 						}
-						System.out.println("Fim/Volta para o Início");
 						protocol.setView(new LinkedHashMap<>());
 						//-------
 					} else System.out.println("Comando invalido, voce nao pertence a uma DHT!");
@@ -200,7 +208,14 @@ public class Dht {
 							text = entrada.nextLine();
 							String keyText = text;
 							BigInteger key = gerarID(keyText, algoritmoHash);
+							
+							//Comeca a procura
+							LinkedHashMap<BigInteger, String> view = new LinkedHashMap<>(); 
 							protocol.delete(key, protocol.getMyStub());
+							//Espera o fim da execucao 
+							while(protocol.getView().isEmpty()) {
+							}
+							protocol.setView(new LinkedHashMap<>());
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
 						else System.out.println("Comando invalido, operacao cancelada!");
