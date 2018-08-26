@@ -55,7 +55,7 @@ public class Dht {
 			while (comando != "quit") {
 				//informacoes que sempre aparecerao ao usuario
 				System.out.println();
-				if(protocol == null) System.out.println("Nao faz parte de uma DHT.");
+				if(!joined) System.out.println("Nao faz parte de uma DHT.");
 				else {
 					System.out.println("Node: " + protocol.getMyName() + " / Id: " + protocol.getNode().getMyId());
 				}
@@ -143,6 +143,9 @@ public class Dht {
 						if(text.equals("s")){
 							//-------
 							protocol.begin_to_leave();
+							System.out.print("Tirando seu registro na Lista de Stubs...");
+							stubList.remove(protocol.getMyStub());
+							gravarStubTxt(stubList, nodesFile);
 							joined = false;
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
