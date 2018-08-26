@@ -52,7 +52,7 @@ public interface Protocol extends Remote {
 	
 	public boolean retrieve(BigInteger key, Protocol originStub) throws RemoteException;
 	
-	public boolean itenOk(String reply, BigInteger key, String value) throws RemoteException;
+	public boolean itemOk(String reply, BigInteger key, String value) throws RemoteException;
 	
 	public boolean view(LinkedHashMap<BigInteger, String> view) throws RemoteException;
 

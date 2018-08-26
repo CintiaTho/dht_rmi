@@ -218,7 +218,7 @@ public class ProtocolImpl implements Protocol {
 			this.sucessor.store(key, value, originStub);
 			return true;
 		}
-		originStub.itenOk("stored", key, value);
+		originStub.itemOk("stored", key, value);
 		return true;
 	}
 
@@ -235,7 +235,7 @@ public class ProtocolImpl implements Protocol {
 				this.getNode().setTexts(update);
 			}
 			else {
-				originStub.itenOk("not_found", key, value);
+				originStub.itemOk("not_found", key, value);
 				return true;
 			}
 		}
@@ -249,7 +249,7 @@ public class ProtocolImpl implements Protocol {
 				this.getNode().setTexts(update);
 			}
 			else {
-				originStub.itenOk("not_found", key, value);
+				originStub.itemOk("not_found", key, value);
 				return true;
 			}
 		}
@@ -263,7 +263,7 @@ public class ProtocolImpl implements Protocol {
 				this.getNode().setTexts(update);
 			}
 			else {
-				originStub.itenOk("not_found", key, value);
+				originStub.itemOk("not_found", key, value);
 				return true;
 			}
 		}
@@ -273,7 +273,7 @@ public class ProtocolImpl implements Protocol {
 			this.sucessor.delete(key, originStub);
 			return true;
 		}
-		originStub.itenOk("deleted", key, value);
+		originStub.itemOk("deleted", key, value);
 		return true;
 	}
 
@@ -287,7 +287,7 @@ public class ProtocolImpl implements Protocol {
 				value = this.getNode().getTexts().get(key);
 			}
 			else {
-				originStub.itenOk("not_found", key, value);
+				originStub.itemOk("not_found", key, value);
 				return true;
 			}
 		}
@@ -298,7 +298,7 @@ public class ProtocolImpl implements Protocol {
 				value = this.getNode().getTexts().get(key);
 			}
 			else {
-				originStub.itenOk("not_found", key, value);
+				originStub.itemOk("not_found", key, value);
 				return true;
 			}
 		}
@@ -309,7 +309,7 @@ public class ProtocolImpl implements Protocol {
 				value = this.getNode().getTexts().get(key);
 			}
 			else {
-				originStub.itenOk("not_found", key, value);
+				originStub.itemOk("not_found", key, value);
 				return true;
 			}
 		}
@@ -319,12 +319,12 @@ public class ProtocolImpl implements Protocol {
 			this.sucessor.retrieve(key, originStub);
 			return true;
 		}
-		originStub.itenOk("retrieve", key, value);
+		originStub.itemOk("retrieve", key, value);
 		return true;
 	}
 
 	//Recebendo a confirmacao do Item achado, guardado, deletado ou não encontrado na DHT
-	public boolean itenOk(String reply, BigInteger key, String value) throws RemoteException {
+	public boolean itemOk(String reply, BigInteger key, String value) throws RemoteException {
 		if(reply.equals("stored")) {
 			System.out.println("Item guardado!");
 			this.view.put(key, value);
