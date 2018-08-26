@@ -73,11 +73,9 @@ public class ProtocolImpl implements Protocol {
 
 			// corner case: primeiro no do DHT
 			System.out.println("Voce e o primeiro node na rede - Criada uma nova DHT!");
-			this.predecessor = this.myStub;
 			this.sucessor = this.myStub;
-			this.getNode().setPrevId(this.getNode().getMyId());
 			this.getNode().setNextId(this.getNode().getMyId());
-			newStub.join_ok(this.getMyStub(), this.getMyStub(), this.getNode().getMyId(), this.getNode().getMyId());
+			//newStub.join_ok(this.getMyStub(), this.getMyStub(), this.getNode().getMyId(), this.getNode().getMyId());
 
 		} else if (this.getNode().getMyId().compareTo(this.getNode().getPrevId()) <= 0 && this.getNode().getPrevId().compareTo(newId) < 0) {
 
@@ -109,10 +107,8 @@ public class ProtocolImpl implements Protocol {
 			}
 
 		} else {
-
 			// caso nao seja o destinatario, deve encaminhar para o sucessor (3.2)
 			return this.sucessor.join(newStub, newId);
-
 		}
 
 		// atualiza o predecessor para o novo no
@@ -133,26 +129,27 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	public boolean join_ok(Protocol predecessor, Protocol sucessor, BigInteger prevId, BigInteger nextId) throws RemoteException {
-		// atualiza o no atual, que eh novo, com o predecessor e sucessor
+		// atualiza o node atual, que eh novo, com o predecessor e sucessor
 		this.predecessor = predecessor;
 		this.sucessor = sucessor;
 		this.getNode().setPrevId(prevId);
 		this.getNode().setNextId(nextId);
-
+		System.out.print("Sua entrada foi aceita e seu lugar encontrado...");
 		return this.predecessor.new_node(this.myStub, this.getNode().getMyId());
 	}
 
 	@Override
 	public boolean new_node(Protocol newStub, BigInteger newId) throws RemoteException {
-		// atualiza o no atual, que ja esta na DHT, com o novo sucessor
+		// atualiza o node atual, que ja esta na DHT, com o novo sucessor
 		this.sucessor = newStub;
 		this.getNode().setNextId(newId);
+		System.out.println("Informado seu Antecessor sobre sua presenca!");
 		return true;
 	}
 	
 	public void begin_to_leave() throws RemoteException {
-		this.sucessor.leave(this.predecessor);
-		this.predecessor.node_gone(this.sucessor);
+		this.sucessor.leave(this.predecessor, this.getNode().getPrevId());
+		this.predecessor.node_gone(this.sucessor, this.getNode().getNextId());
 
 		HashMap<BigInteger, String> entradasAntigas = this.getNode().getTexts();
 		for (HashMap.Entry<BigInteger, String> entry: entradasAntigas.entrySet()) {
@@ -163,18 +160,20 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	@Override
-	public boolean leave(Protocol newStub) throws RemoteException {
+	public boolean leave(Protocol predecessor, BigInteger prevId) throws RemoteException {
 		// atualiza o no atual, que ja esta na DHT, com o novo predecessor
-		this.predecessor = newStub;
-		this.getNode().setPrevId(newStub.getNode().getMyId());
+		System.out.print("Informado seu Sucessor sobre sua saida...");
+		this.predecessor = predecessor;
+		this.getNode().setPrevId(predecessor.getNode().getMyId());
 		return true;
 	}
 
 	@Override
-	public boolean node_gone(Protocol newStub) throws RemoteException {
+	public boolean node_gone(Protocol sucessor, BigInteger nextId) throws RemoteException {
 		// atualiza o no atual, que ja esta na DHT, com o novo sucessor
-		this.sucessor = newStub;
-		this.getNode().setNextId(newStub.getNode().getMyId());
+		System.out.print("Informado seu Antecessor sobre sua saida...");
+		this.sucessor = sucessor;
+		this.getNode().setNextId(sucessor.getNode().getMyId());
 		return true;
 	}
 
@@ -225,7 +224,7 @@ public class ProtocolImpl implements Protocol {
 			this.setView(view);
 		}
 		else {
-		System.out.println("Adicionando Node na View...");
+		System.out.print("Adicionando Node na View...");
 		view.put(this.getNode().getMyId(), this.getMyName());
 		}
 		return true;

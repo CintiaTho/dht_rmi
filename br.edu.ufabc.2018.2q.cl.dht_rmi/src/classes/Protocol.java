@@ -40,9 +40,9 @@ public interface Protocol extends Remote {
 
 	public void begin_to_leave() throws RemoteException;
 	
-	public boolean leave(Protocol newStub) throws RemoteException;
+	public boolean leave(Protocol predecessor, BigInteger prevId) throws RemoteException;
 
-	public boolean node_gone(Protocol newStub) throws RemoteException;
+	public boolean node_gone(Protocol newStub, BigInteger nextId) throws RemoteException;
 
 	public boolean transfer(BigInteger key, String value) throws RemoteException;
 
