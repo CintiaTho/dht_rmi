@@ -241,6 +241,7 @@ public class Dht {
 							int count = 1;
 							for (HashMap.Entry<BigInteger, String> it : protocol.getNode().getTexts().entrySet()){  
 								System.out.println("Key "+count+": "+it.getKey()+" / Valor: "+it.getValue());
+								count++;
 							}
 							System.out.println();
 						}
