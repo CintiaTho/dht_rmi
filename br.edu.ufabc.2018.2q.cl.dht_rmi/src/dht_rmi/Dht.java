@@ -255,10 +255,13 @@ public class Dht {
 							while(protocol.getView().isEmpty()) {
 							}
 							System.out.println("Resultado:");
-							for (HashMap.Entry<BigInteger, String> it : protocol.getView().entrySet()){  
-								System.out.println("NodeNome : "+it.getValue()+" / Id: "+it.getKey()+" -->");
+							System.out.println(" ____");
+							for (HashMap.Entry<BigInteger, String> it : protocol.getView().entrySet()){
+								System.out.println("|    |");
+								System.out.println("|    V");
+								System.out.println("| NodeNome : "+it.getValue()+" / Id: "+it.getKey());
 							}
-							System.out.println("Fim/Volta para o Início");
+							System.out.println("|____/");
 							protocol.setView(new LinkedHashMap<>());
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
@@ -272,7 +275,7 @@ public class Dht {
 					text = entrada.nextLine();
 					if(text.equals("s")){
 						//-------
-						if(protocol != null) protocol.begin_to_leave();
+						if(joined) protocol.begin_to_leave();
 						System.out.println("Sessao Finalizada!");
 						System.exit(0);
 						//-------
