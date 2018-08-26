@@ -40,12 +40,13 @@ public class Dht {
 
 		ArrayList<Protocol> stubList = new ArrayList<Protocol>();
 		String file = "./src/dht_rmi/nodes_list.txt";
+		File stubFile = new File(file);
 		String algoritmoHash = "MD5";
 
 		Scanner entrada = new Scanner(System.in);
 		String comando = "";
 		String text;
-
+		
 		//texto inicial explicativo sobre o funcionamento da interface
 		System.out.println("Digite: 'commands' para visualisar a lista de possiveis comandos permitidos ao usuario.");
 		System.out.println("Caso ja os conheca, digite a primeira acao que deseja realizar e aperte enter...");
@@ -92,9 +93,9 @@ public class Dht {
 							//-------
 							//Cria o no (cria o ID e Stub) se não criado
 							if(protocol==null) protocol = criarNodeDHT(protocol, algoritmoHash);
-
+							
 							//Busca os registros Stub presentes no arquivo
-							stubList = leituraStubTxt(new File(file));
+							stubList = leituraStubTxt(stubFile);
 							
 							System.out.println("Procurando e tentando entrar em uma DHT...");
 							//Unico erro a ser tratado: ao tentar entrar na rede (verificando um por um os nos da lista e caso um esteja desativado - retira da lista
@@ -129,7 +130,7 @@ public class Dht {
 							joined = true;
 							stubList.add(protocol.getMyStub());
 							//Gravando as alteracoes no arquivo de Stubs
-							if(gravarStubTxt(stubList, new File(file))) System.out.println("Gravação/Atualização terminada!");
+							if(gravarStubTxt(stubList, stubFile)) System.out.println("Gravação/Atualização terminada!");
 							else System.out.println("Nao foi possivel gravar");
 							//-------
 						} else if(text.equals("n")) System.out.println("Operacao cancelada!");
@@ -147,7 +148,7 @@ public class Dht {
 							System.out.print("Tirando seu registro na Lista de Stubs...");
 							stubList.remove(protocol.getMyStub());
 							//Gravando as alteracoes no arquivo de Stubs
-							if(gravarStubTxt(stubList, new File(file))) System.out.println("Gravação/Atualização terminada!");
+							if(gravarStubTxt(stubList, stubFile)) System.out.println("Gravação/Atualização terminada!");
 							else System.out.println("Nao foi possivel gravar");
 							//Atualizando a situação do node local -> Fora de uma DHT
 							joined = false;
