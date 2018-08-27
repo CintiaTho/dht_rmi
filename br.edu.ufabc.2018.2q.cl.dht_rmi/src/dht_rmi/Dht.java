@@ -114,13 +114,16 @@ public class Dht {
 									}
 									if(teste) break;
 								}
-
-								//remove os stubs conhecidamente inativos
-								for(Protocol node: remover) {
-									stubList.remove(node);
-									System.err.println("Node indisponível removido: " + node.toString());
+								
+								if(!remover.isEmpty()) {
+									//remove os stubs conhecidamente inativos
+									for(Protocol node: remover) {
+										stubList.remove(node);
+										System.err.println("Node indisponível removido: " + node.toString());
+									}
 								}
 							}
+							
 							//Caso a lista esteja ou fique vazia (nao conseguiu se conectar com otros nodes) iniciar uma nova DHT
 							if(stubList.isEmpty()) {
 								protocol.join(protocol.getMyStub(), protocol.getNode().getMyId());
